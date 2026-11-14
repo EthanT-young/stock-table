@@ -11,7 +11,6 @@ import {
   YAxis,
   type TooltipContentProps,
 } from "recharts";
-import { BackupLabel } from "@/components/backup-label";
 import {
   formatDate,
   formatPercent,
@@ -63,11 +62,9 @@ function ChartTooltip({ active, payload }: TooltipContentProps) {
  */
 export function PriceChart({
   prices,
-  backupFrom,
 }: {
   /** Newest first, as stored. */
   prices: DailyPrice[];
-  backupFrom: number | null;
 }) {
   const [range, setRange] = useState<ChartRange>("100D");
   const reducedMotion = usePrefersReducedMotion();
@@ -86,12 +83,9 @@ export function PriceChart({
     <section className="flex min-h-[374px] flex-col rounded-md border border-border bg-surface p-5 md:p-6 lg:min-h-[408px]">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-label font-semibold text-muted">
-              PRICE PERFORMANCE
-            </p>
-            <BackupLabel backupFrom={backupFrom} />
-          </div>
+          <p className="text-label font-semibold text-muted">
+            PRICE PERFORMANCE
+          </p>
           <div className="mt-3 flex flex-wrap items-center gap-4">
             <p className="text-[34px] leading-none font-semibold text-ink md:text-display">
               {formatUsd(latest.close)}

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
-import { DecoPanel } from "@/components/deco-panel";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import {
@@ -97,16 +96,6 @@ export default async function StockPage({
             </Suspense>
           </div>
         </div>
-
-        <DecoPanel tone="note" className="mt-8 p-5 text-ink md:p-6">
-          <h2 className="text-lg font-semibold">
-            A focused window, not a live feed.
-          </h2>
-          <p className="mt-2 text-xs">
-            Prices are the latest 100 trading days from AlphaVantage. 1M, 3M and
-            100D filter this same data in your browser. Not financial advice.
-          </p>
-        </DecoPanel>
       </main>
       <SiteFooter />
     </>

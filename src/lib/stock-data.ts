@@ -7,9 +7,9 @@
  * Each piece of data is looked up in this order:
  *   1. our cache, if the stored copy is recent enough        (no API request)
  *   2. AlphaVantage, if live calls are on and the quota allows
- *   3. the last copy we stored, even if old                   (marked as backup data)
- *   4. the snapshot committed in the repo                     (marked as backup data)
- * so a page always shows something, and says so when the data isn't current.
+ *   3. the last copy we stored, even if old
+ *   4. the snapshot committed in the repo
+ * so a page always shows something.
  */
 
 import "server-only";
@@ -44,17 +44,6 @@ export const MAX_AGE_MS = {
   shares: 30 * DAY_MS, // share counts change once a quarter
 };
 
-/** Data for one page section, plus how current it is. */
-export interface Sourced<T> {
-  value: T;
-  /**
-   * null when everything came from AlphaVantage within its freshness window. Otherwise
-   * the fetch time (ms since epoch) of the oldest backup data used, for the
-   * "cached data from <date>" label.
-   */
-  backupFrom: number | null;
-}
-
 export interface MarketCap {
   value: number;
   /** True when calculated as shares outstanding x latest close (no OVERVIEW access). */
@@ -74,8 +63,6 @@ export interface CompanyProfile {
   industry: string | null;
   country: string | null;
   marketCap: MarketCap | null;
-  /** True when OVERVIEW is premium-only for our key, so the card explains the N/As. */
-  overviewPremium: boolean;
 }
 
 /** What the loaders depend on, replaceable in tests. */
@@ -84,28 +71,6 @@ export interface StockDataDeps {
   fetchText: (params: Record<string, string>) => Promise<string>;
   snapshot: SnapshotReader;
   cacheOptions?: CacheOptions;
-}
-
-/** A value plus whether it is backup data and when it was fetched. */
-interface Piece<T> {
-  value: T;
-  fetchedAt: number;
-  backup: boolean;
-}
-
-/**
- * The fetch time of the oldest backup piece, for the "cached data from <date>" label,
- * or null if none of the pieces is backup data.
- */
-function oldestBackup(pieces: (Piece<unknown> | null)[]): number | null {
-  let oldest: number | null = null;
-  for (const piece of pieces) {
-    if (piece !== null && piece.backup) {
-      oldest =
-        oldest === null ? piece.fetchedAt : Math.min(oldest, piece.fetchedAt);
-    }
-  }
-  return oldest;
 }
 
 export function createStockData(deps: StockDataDeps) {
@@ -118,17 +83,12 @@ export function createStockData(deps: StockDataDeps) {
     maxAgeMs: number,
     fetchFresh: () => Promise<T>,
     fromSnapshot: () => Timestamped<T> | null,
-  ): Promise<Piece<T> | null> {
+  ): Promise<T | null> {
     try {
       const result = await cached(key, maxAgeMs, fetchFresh, deps.cacheOptions);
-      return {
-        value: result.value,
-        fetchedAt: result.fetchedAt,
-        backup: result.stale,
-      };
+      return result.value; // fresh, or the last stored copy if the refresh failed
     } catch {
-      const stored = fromSnapshot();
-      return stored ? { ...stored, backup: true } : null;
+      return fromSnapshot()?.value ?? null;
     }
   }
 
@@ -136,7 +96,7 @@ export function createStockData(deps: StockDataDeps) {
     return JSON.parse(await deps.fetchText(params));
   }
 
-  function loadDaily(symbol: string): Promise<Piece<DailyPrice[]> | null> {
+  function loadDaily(symbol: string): Promise<DailyPrice[] | null> {
     return load(
       `daily:${symbol}`,
       MAX_AGE_MS.daily,
@@ -172,10 +132,7 @@ export function createStockData(deps: StockDataDeps) {
    * check (cached for a day) covers all 16 companies: with a free key that is a single
    * request per day instead of one per company.
    */
-  async function loadOverview(symbol: string): Promise<{
-    check: Piece<boolean> | null;
-    overview: Piece<Overview> | null;
-  }> {
+  async function loadOverview(symbol: string): Promise<Overview | null> {
     // If the check has to call OVERVIEW and the key has access, that call already
     // returned this company's data; keep it so we don't request it a second time.
     let fetchedByCheck: Overview | undefined;
@@ -192,10 +149,10 @@ export function createStockData(deps: StockDataDeps) {
       () => deps.snapshot.overviewPremium(),
     );
     // If we can't tell (no answer anywhere), treat it like premium-only: fields show N/A.
-    if (check === null || check.value) {
-      return { check, overview: null };
+    if (check === null || check) {
+      return null;
     }
-    const overview = await load(
+    return load(
       `overview:${symbol}`,
       MAX_AGE_MS.overview,
       async () => {
@@ -214,7 +171,6 @@ export function createStockData(deps: StockDataDeps) {
       },
       () => null, // the snapshot doesn't store OVERVIEW data
     );
-    return { check, overview };
   }
 
   /** Fetches LISTING_STATUS once and keeps our companies' rows, keyed by symbol. */
@@ -235,7 +191,7 @@ export function createStockData(deps: StockDataDeps) {
     return Object.fromEntries(rows.map((row) => [row.symbol, row]));
   }
 
-  async function loadListing(symbol: string): Promise<Piece<Listing> | null> {
+  async function loadListing(symbol: string): Promise<Listing | null> {
     // One LISTING_STATUS request covers all 16 companies, so the whole table is cached
     // under one key and each page picks its own row.
     const table = await load(
@@ -244,18 +200,11 @@ export function createStockData(deps: StockDataDeps) {
       fetchAllListings,
       () => null, // the snapshot stores rows one by one; used just below
     );
-    const row = table?.value[symbol];
-    if (table && row) {
-      return { value: row, fetchedAt: table.fetchedAt, backup: table.backup };
-    }
-    // Not in the table (or no table at all): use the snapshot's row as backup data.
-    const stored = deps.snapshot.listing(symbol);
-    return stored ? { ...stored, backup: true } : null;
+    // Not in the table (or no table at all): use the snapshot's row instead.
+    return table?.[symbol] ?? deps.snapshot.listing(symbol)?.value ?? null;
   }
 
-  function loadShares(
-    symbol: string,
-  ): Promise<Piece<SharesOutstanding> | null> {
+  function loadShares(symbol: string): Promise<SharesOutstanding | null> {
     return load(
       `shares:${symbol}`,
       MAX_AGE_MS.shares,
@@ -268,13 +217,8 @@ export function createStockData(deps: StockDataDeps) {
   }
 
   /** Daily prices, newest first, or null if none are available anywhere. */
-  async function getDailyPrices(
-    symbol: string,
-  ): Promise<Sourced<DailyPrice[]> | null> {
-    const daily = await loadDaily(symbol);
-    return daily
-      ? { value: daily.value, backupFrom: oldestBackup([daily]) }
-      : null;
+  function getDailyPrices(symbol: string): Promise<DailyPrice[] | null> {
+    return loadDaily(symbol);
   }
 
   /**
@@ -282,32 +226,25 @@ export function createStockData(deps: StockDataDeps) {
    * (prices, OVERVIEW check, listing, share count), so if the per-minute quota runs out
    * part-way, the most important data has already been fetched.
    */
-  async function getCompanyProfile(
-    symbol: string,
-  ): Promise<Sourced<CompanyProfile>> {
+  async function getCompanyProfile(symbol: string): Promise<CompanyProfile> {
     const daily = await loadDaily(symbol);
-    const { check, overview } = await loadOverview(symbol);
+    const overview = await loadOverview(symbol);
 
     if (overview) {
       // Premium key: OVERVIEW has every field, including the real market cap.
-      const o = overview.value;
       return {
-        value: {
-          symbol,
-          name: o.name,
-          assetType: o.assetType,
-          exchange: o.exchange,
-          description: o.description,
-          sector: o.sector,
-          industry: o.industry,
-          country: o.country,
-          marketCap:
-            o.marketCap === null
-              ? null
-              : { value: o.marketCap, estimated: false, sharesAsOf: null },
-          overviewPremium: false,
-        },
-        backupFrom: oldestBackup([overview]),
+        symbol,
+        name: overview.name,
+        assetType: overview.assetType,
+        exchange: overview.exchange,
+        description: overview.description,
+        sector: overview.sector,
+        industry: overview.industry,
+        country: overview.country,
+        marketCap:
+          overview.marketCap === null
+            ? null
+            : { value: overview.marketCap, estimated: false, sharesAsOf: null },
       };
     }
 
@@ -316,34 +253,26 @@ export function createStockData(deps: StockDataDeps) {
     // we can from free endpoints; the OVERVIEW-only fields show N/A.
     const listing = await loadListing(symbol);
     const shares = await loadShares(symbol);
-    const latestClose = daily?.value[0]?.close;
+    const latestClose = daily?.[0]?.close;
     const marketCap: MarketCap | null =
       shares && latestClose !== undefined
         ? {
-            value: estimateMarketCap(shares.value.shares, latestClose),
+            value: estimateMarketCap(shares.shares, latestClose),
             estimated: true,
-            sharesAsOf: shares.value.date,
+            sharesAsOf: shares.date,
           }
         : null;
 
     return {
-      value: {
-        symbol,
-        name: listing?.value.name ?? null,
-        assetType: listing?.value.assetType ?? null,
-        exchange: listing?.value.exchange ?? null,
-        description: null,
-        sector: deps.snapshot.sector(symbol),
-        industry: null,
-        country: null,
-        marketCap,
-        overviewPremium: check === null || check.value,
-      },
-      // Only data that is shown counts toward the label. Prices and share counts appear
-      // only through the estimated market cap.
-      backupFrom: oldestBackup(
-        marketCap ? [check, listing, shares, daily] : [check, listing],
-      ),
+      symbol,
+      name: listing?.name ?? null,
+      assetType: listing?.assetType ?? null,
+      exchange: listing?.exchange ?? null,
+      description: null,
+      sector: deps.snapshot.sector(symbol),
+      industry: null,
+      country: null,
+      marketCap,
     };
   }
 

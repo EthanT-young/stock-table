@@ -11,7 +11,7 @@ import { NOT_AVAILABLE, toSentenceCase } from "@/lib/format";
  * finished HTML. While it waits, the page shows <CompanyIdentitySkeleton /> instead.
  */
 export async function CompanyIdentity({ symbol }: { symbol: string }) {
-  const { value: profile } = await loadProfile(symbol);
+  const profile = await loadProfile(symbol);
   const name = profile.name ?? NOT_AVAILABLE;
 
   return (

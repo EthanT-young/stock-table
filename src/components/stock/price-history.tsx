@@ -1,5 +1,4 @@
 import { loadPrices } from "@/app/stock/[symbol]/data";
-import { BackupLabel } from "@/components/backup-label";
 import { Skeleton } from "@/components/skeleton";
 import {
   NOT_AVAILABLE,
@@ -21,13 +20,7 @@ function changeColor(changePercent: number | null): string {
 }
 
 /** The panel frame and heading, shared by the table and its loading placeholder. */
-function HistoryPanel({
-  backupFrom,
-  children,
-}: {
-  backupFrom: number | null;
-  children: React.ReactNode;
-}) {
+function HistoryPanel({ children }: { children: React.ReactNode }) {
   return (
     <section className="overflow-hidden rounded-md border border-border bg-surface">
       <div className="flex flex-wrap items-start justify-between gap-3 p-5 md:p-6">
@@ -37,12 +30,6 @@ function HistoryPanel({
           </h2>
           <p className="mt-1 text-xs text-muted">
             100 trading days · Newest first
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <BackupLabel backupFrom={backupFrom} />
-          <p className="hidden rounded-xl bg-raised px-3 py-2 text-xs font-medium text-gold-ink sm:block">
-            TIME_SERIES_DAILY · compact
           </p>
         </div>
       </div>
@@ -60,17 +47,17 @@ export async function PriceHistory({ symbol }: { symbol: string }) {
   const prices = await loadPrices(symbol);
   if (!prices) {
     return (
-      <HistoryPanel backupFrom={null}>
+      <HistoryPanel>
         <p className="px-6 pb-6 text-body text-muted">
           Price history isn&rsquo;t available right now. Please try again later.
         </p>
       </HistoryPanel>
     );
   }
-  const rows = withDailyChange(prices.value);
+  const rows = withDailyChange(prices);
 
   return (
-    <HistoryPanel backupFrom={prices.backupFrom}>
+    <HistoryPanel>
       {/* tabIndex lets keyboard users focus the box and scroll it with the arrow keys. */}
       <div
         tabIndex={0}
@@ -131,20 +118,13 @@ export async function PriceHistory({ symbol }: { symbol: string }) {
           </tbody>
         </table>
       </div>
-      <p className="px-5 py-4 text-xs text-muted md:px-6 md:py-5">
-        <span className="md:hidden">Showing latest days · Scroll for more</span>
-        <span className="hidden md:inline">
-          {rows.length} rows available&nbsp;&nbsp;·&nbsp;&nbsp;Change vs.
-          previous trading day&nbsp;&nbsp;·&nbsp;&nbsp;Oldest row: N/A
-        </span>
-      </p>
     </HistoryPanel>
   );
 }
 
 export function PriceHistorySkeleton() {
   return (
-    <HistoryPanel backupFrom={null}>
+    <HistoryPanel>
       <div className="fade-in-late space-y-4 px-5 pb-6 md:px-6">
         {[0, 1, 2, 3, 4, 5].map((row) => (
           <Skeleton key={row} className="h-4 w-full" />

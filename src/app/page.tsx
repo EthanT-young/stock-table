@@ -74,7 +74,7 @@ export default function HomePage() {
 
         <StockDirectory items={items} />
       </main>
-      <SiteFooter note="Fixed collection · No live data on this page" />
+      <SiteFooter />
     </>
   );
 }

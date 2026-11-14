@@ -117,24 +117,22 @@ function setup(
 }
 
 describe("getDailyPrices", () => {
-  it("returns live prices with no backup label", async () => {
+  it("returns live prices", async () => {
     const { getDailyPrices } = setup({
       TIME_SERIES_DAILY: dailyBody("110.00"),
     });
-    const result = await getDailyPrices("AAPL");
-    expect(result?.value[0]).toEqual({
+    const prices = await getDailyPrices("AAPL");
+    expect(prices?.[0]).toEqual({
       date: "2026-11-13",
       close: 110,
       volume: 1000,
     });
-    expect(result?.backupFrom).toBeNull();
   });
 
-  it("falls back to the snapshot, labelled with its date, when the API fails", async () => {
+  it("falls back to the snapshot when the API fails", async () => {
     const { getDailyPrices } = setup({ TIME_SERIES_DAILY: RATE_LIMITED });
-    const result = await getDailyPrices("AAPL");
-    expect(result?.value[0].close).toBe(50);
-    expect(result?.backupFrom).toBe(SNAPSHOT_TIME);
+    const prices = await getDailyPrices("AAPL");
+    expect(prices?.[0].close).toBe(50);
   });
 
   it("returns null when no data exists anywhere", async () => {
@@ -162,8 +160,7 @@ describe("getCompanyProfile with a free key", () => {
 
   it("builds the profile from free endpoints, with an estimated market cap", async () => {
     const { getCompanyProfile } = setup(freeKeyAnswers);
-    const { value, backupFrom } = await getCompanyProfile("AAPL");
-    expect(value).toEqual({
+    expect(await getCompanyProfile("AAPL")).toEqual({
       symbol: "AAPL",
       name: "Apple Inc",
       assetType: "Stock",
@@ -173,9 +170,7 @@ describe("getCompanyProfile with a free key", () => {
       industry: null,
       country: null,
       marketCap: { value: 110_000, estimated: true, sharesAsOf: "2026-09-30" },
-      overviewPremium: true,
     });
-    expect(backupFrom).toBeNull();
   });
 
   it("makes requests in order of importance", async () => {
@@ -197,22 +192,20 @@ describe("getCompanyProfile with a free key", () => {
     expect(calls.filter((c) => c === "LISTING_STATUS")).toHaveLength(1);
   });
 
-  it("uses snapshot data when live calls fail, labelled with the oldest date", async () => {
+  it("uses snapshot data when live calls fail", async () => {
     const { getCompanyProfile } = setup({
       TIME_SERIES_DAILY: RATE_LIMITED,
       OVERVIEW: RATE_LIMITED,
       LISTING_STATUS: RATE_LIMITED,
       SHARES_OUTSTANDING: RATE_LIMITED,
     });
-    const { value, backupFrom } = await getCompanyProfile("AAPL");
-    expect(value.name).toBe("Apple Inc");
-    expect(value.overviewPremium).toBe(true); // from the snapshot
-    expect(value.marketCap).toEqual({
+    const profile = await getCompanyProfile("AAPL");
+    expect(profile.name).toBe("Apple Inc");
+    expect(profile.marketCap).toEqual({
       value: 500,
       estimated: true,
       sharesAsOf: "2026-06-30",
     });
-    expect(backupFrom).toBe(SNAPSHOT_TIME);
   });
 
   it("shows N/A (null) for anything that isn't available", async () => {
@@ -222,10 +215,10 @@ describe("getCompanyProfile with a free key", () => {
       LISTING_STATUS: RATE_LIMITED,
       SHARES_OUTSTANDING: RATE_LIMITED,
     });
-    const { value } = await getCompanyProfile("TSLA");
-    expect(value.name).toBeNull();
-    expect(value.sector).toBeNull();
-    expect(value.marketCap).toBeNull();
+    const profile = await getCompanyProfile("TSLA");
+    expect(profile.name).toBeNull();
+    expect(profile.sector).toBeNull();
+    expect(profile.marketCap).toBeNull();
   });
 });
 
@@ -245,19 +238,16 @@ describe("getCompanyProfile with a premium key", () => {
         MarketCapitalization: "3352782701000",
       }),
     });
-    const { value, backupFrom } = await getCompanyProfile("AAPL");
-    expect(value).toMatchObject({
+    expect(await getCompanyProfile("AAPL")).toMatchObject({
       description: "Makes iPhones.",
       industry: "ELECTRONIC COMPUTERS",
       country: "USA",
       marketCap: { value: 3352782701000, estimated: false, sharesAsOf: null },
-      overviewPremium: false,
     });
-    expect(backupFrom).toBeNull();
   });
 });
 
-describe("review fixes", () => {
+describe("edge cases", () => {
   const PREMIUM_KEY_OVERVIEW = JSON.stringify({
     Symbol: "AAPL",
     Name: "Apple Inc",
@@ -275,9 +265,7 @@ describe("review fixes", () => {
       LISTING_STATUS: partialCsv,
       SHARES_OUTSTANDING: SHARES_BODY,
     });
-    const first = await getCompanyProfile("AAPL");
-    expect(first.value.name).toBe("Apple Inc"); // from the snapshot
-    expect(first.backupFrom).toBe(SNAPSHOT_TIME);
+    expect((await getCompanyProfile("AAPL")).name).toBe("Apple Inc"); // from the snapshot
     await getCompanyProfile("AAPL");
     // Not cached, so the next page load tries again.
     expect(calls.filter((c) => c === "LISTING_STATUS")).toHaveLength(2);
@@ -294,21 +282,21 @@ describe("review fixes", () => {
     ]);
   });
 
-  it("labels the profile when the OVERVIEW answer itself came from the snapshot", async () => {
+  it("uses the snapshot's premium-only answer when the OVERVIEW check fails", async () => {
     const { getCompanyProfile } = setup({
       TIME_SERIES_DAILY: dailyBody("110.00"),
       OVERVIEW: RATE_LIMITED,
       LISTING_STATUS: LISTING_CSV,
       SHARES_OUTSTANDING: SHARES_BODY,
     });
-    const { value, backupFrom } = await getCompanyProfile("AAPL");
-    expect(value.overviewPremium).toBe(true);
-    expect(backupFrom).toBe(SNAPSHOT_TIME);
+    const profile = await getCompanyProfile("AAPL");
+    // Treated as a free key: the profile comes from the free endpoints.
+    expect(profile.name).toBe("Apple Inc");
+    expect(profile.description).toBeNull();
+    expect(profile.marketCap?.estimated).toBe(true);
   });
 
-  it("doesn't label the profile for backup data that isn't shown", async () => {
-    // No prices anywhere for TSLA, so no market cap; its share count would come from
-    // the snapshot but isn't displayed, so it must not trigger the label.
+  it("shows no market cap without prices, even when a share count exists", async () => {
     const snap: Snapshot = {
       ...sampleSnapshot,
       shares: {
@@ -327,9 +315,8 @@ describe("review fixes", () => {
       },
       snap,
     );
-    const { value, backupFrom } = await getCompanyProfile("TSLA");
-    expect(value.marketCap).toBeNull();
-    expect(value.name).toBe("Tesla Inc");
-    expect(backupFrom).toBeNull();
+    const profile = await getCompanyProfile("TSLA");
+    expect(profile.marketCap).toBeNull();
+    expect(profile.name).toBe("Tesla Inc");
   });
 });

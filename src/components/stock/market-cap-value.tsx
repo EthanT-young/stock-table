@@ -47,10 +47,7 @@ export function MarketCapValue({
       >
         <strong className="block font-semibold">Estimated market cap</strong>
         <span className="mt-2 block text-muted">
-          {sharesPart} × {closePart}. AlphaVantage reports a quarterly average
-          share count, so this can differ from published market caps by a few
-          percent. The exact figure comes from AlphaVantage&rsquo;s Company
-          Overview, which needs a premium key.
+          {sharesPart} × {closePart}.
         </span>
       </span>
     </>

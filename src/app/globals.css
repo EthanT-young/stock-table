@@ -17,14 +17,12 @@
   --color-table-header: #f4ede4;
   --color-track: #f1eae1; /* track behind the 1M / 3M / 100D buttons */
   --color-kbd: #f3ede6; /* the "⌘ K" keyboard hint */
-  --color-note: #f8f2e7; /* "A focused window" note */
   --color-panel-404: #fbf6f0;
   --color-line: #e4dbd0; /* grid lines, dividers, scroll track */
 
   /* Outlines */
   --color-border: rgb(217 204 184 / 0.38); /* card outlines */
   --color-border-strong: rgb(197 166 110 / 0.85); /* hero and discovery bar */
-  --color-note-border: rgb(207 183 139 / 0.7);
   --color-input-border: rgb(212 196 176 / 0.7);
   --color-chip-border: rgb(215 189 160 / 0.7);
 
