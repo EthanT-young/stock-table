@@ -23,7 +23,7 @@ export interface Ticker {
 // the compiler rejects any code that tries to add, remove or replace entries.
 export const TICKERS: readonly Ticker[] = [
   { symbol: "AAPL", displayName: "Apple", suit: "spade" },
-  { symbol: "MSFT", displayName: "Microsoft", suit: "heart" },
+  { symbol: "AMD", displayName: "Advanced Micro Devices Inc", suit: "heart" },
   { symbol: "NVDA", displayName: "NVIDIA", suit: "club" },
   { symbol: "GOOGL", displayName: "Alphabet", suit: "diamond" },
   { symbol: "AMZN", displayName: "Amazon", suit: "spade" },

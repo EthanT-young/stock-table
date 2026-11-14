@@ -67,8 +67,8 @@ describe("planSnapshotTasks", () => {
   it("only refetches items older than maxAge when one is given", () => {
     const snap = emptySnapshot();
     snap.daily.AAPL = { fetchedAt: NOW - 2 * DAY, value: [] };
-    snap.daily.MSFT = { fetchedAt: NOW - DAY / 2, value: [] };
-    const daily = planSnapshotTasks(snap, ["AAPL", "MSFT"], NOW, DAY).filter(
+    snap.daily.AMD = { fetchedAt: NOW - DAY / 2, value: [] };
+    const daily = planSnapshotTasks(snap, ["AAPL", "AMD"], NOW, DAY).filter(
       (t) => t.kind === "daily",
     );
     expect(daily).toEqual([{ kind: "daily", symbol: "AAPL" }]);

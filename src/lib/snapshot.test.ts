@@ -43,10 +43,10 @@ describe("createSnapshotReader", () => {
   });
 
   it("returns null for missing items", () => {
-    expect(reader.daily("MSFT")).toBeNull();
-    expect(reader.listing("MSFT")).toBeNull();
-    expect(reader.shares("MSFT")).toBeNull();
-    expect(reader.sector("MSFT")).toBeNull();
+    expect(reader.daily("AMD")).toBeNull();
+    expect(reader.listing("AMD")).toBeNull();
+    expect(reader.shares("AMD")).toBeNull();
+    expect(reader.sector("AMD")).toBeNull();
   });
 
   it("handles a snapshot with no sector or OVERVIEW data yet", () => {
