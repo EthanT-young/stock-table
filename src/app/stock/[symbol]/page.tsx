@@ -31,8 +31,8 @@ export async function generateMetadata({
   const ticker = findTicker(symbol);
   return {
     title: ticker
-      ? `${ticker.symbol} · Test Design`
-      : "Not found · Test Design",
+      ? `${ticker.symbol} · Stock Table`
+      : "Not found · Stock Table",
   };
 }
 

@@ -108,9 +108,6 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
             >
               Find your next company.
             </h2>
-            <p className="mt-1 text-xs text-ivory">
-              16 companies. One focused collection.
-            </p>
           </div>
 
           <div className="relative xl:mt-0.5">
@@ -184,15 +181,6 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
               : `${items.length} companies  /  ${sectors.length} sectors`}
           </p>
         </div>
-        <p className="mt-2 text-small text-muted md:text-body">
-          <span className="md:hidden">
-            16 familiar names, all in one place.
-          </span>
-          <span className="hidden md:inline">
-            From everyday essentials to what&rsquo;s next. Pick a company to
-            look closer.
-          </span>
-        </p>
 
         {shown.length > 0 ? (
           <ul className="mt-6 grid gap-2.5 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">

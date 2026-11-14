@@ -17,9 +17,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Test Design",
-  description:
-    "A little market clarity: 16 familiar companies, their story and 100 days of prices.",
+  title: "Stock Table",
+  description: "16 familiar companies, their story and 100 days of prices.",
 };
 
 /**

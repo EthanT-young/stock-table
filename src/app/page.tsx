@@ -35,15 +35,12 @@ export default function HomePage() {
 
   return (
     <>
-      <SiteHeader showTagline />
+      <SiteHeader />
       <main className="mx-auto w-full max-w-[1440px] px-5 md:px-16">
         <DecoPanel
           tone="crimson"
           className="mt-4 p-6 md:mt-6 md:p-10 lg:hidden"
         >
-          <p className="text-xs font-medium tracking-[1.2px] text-ivory">
-            CURATED. NOT COMPLICATED.
-          </p>
           <Image
             src="/suits/hero-spade.svg"
             alt=""
@@ -52,16 +49,12 @@ export default function HomePage() {
             height={34}
             className="absolute top-0 right-0"
           />
-          <h1 className="mt-8 font-display text-display leading-[49px] text-hero-heading md:text-hero md:leading-tight">
+          <h1 className="pt-12 font-display text-display leading-[49px] text-hero-heading md:text-hero md:leading-tight">
             Big companies.{" "}
             <span className="block text-hero-italic italic md:inline">
               A clearer view.
             </span>
           </h1>
-          <p className="mt-6 max-w-[520px] text-sm text-ivory md:text-lead">
-            Explore 16 familiar names. Get the company story, then follow the
-            numbers.
-          </p>
           <Image
             src="/ornaments/diamond-divider.svg"
             alt=""

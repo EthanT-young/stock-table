@@ -79,9 +79,6 @@ export function DealButton() {
         />
         Deal me a company
       </button>
-      <p className="mt-2 text-micro text-ivory">
-        A random pick from the 16-company collection
-      </p>
 
       <dialog
         ref={dialogRef}
