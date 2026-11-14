@@ -66,7 +66,7 @@ export function PriceChart({
   /** Newest first, as stored. */
   prices: DailyPrice[];
 }) {
-  const [range, setRange] = useState<ChartRange>("3M");
+  const [range, setRange] = useState<ChartRange>("5D");
   const reducedMotion = usePrefersReducedMotion();
 
   const inRange = pricesInRange(prices, range);
