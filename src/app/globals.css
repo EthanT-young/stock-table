@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Design tokens from the Figma design ("Test Design").
+ *
+ * Tailwind turns each token into utility classes: --color-gold gives bg-gold, text-gold,
+ * border-gold...; --text-hero gives text-hero; --font-display gives font-display.
+ * Change a value here and every component using it follows.
+ */
+@theme {
+  /* Backgrounds, darkest to lightest */
+  --color-page: #071b16;
+  --color-track: #071f18; /* track behind the 1M / 3M / 100D buttons */
+  --color-surface: #102b23; /* nav bar, cards, table rows */
+  --color-surface-alt: #143227; /* alternate table rows */
+  --color-raised: #153d30; /* hero, "Behind the ticker", chips */
+  --color-table-header: #1a3c2d;
+  --color-line: #345246; /* grid lines, dividers, scroll track */
+  --color-border: rgb(113 97 60 / 0.62); /* card outlines */
+  --color-border-hero: rgb(181 155 97 / 0.7); /* dashed hero outline */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Text and accents */
+  --color-cream: #f5eedb; /* main text, playing cards, logo tiles */
+  --color-muted: #a9bdb0; /* secondary text, labels */
+  --color-gold: #e8c779; /* accent, selected button */
+  --color-on-gold: #17271c; /* text on gold backgrounds */
+  --color-positive: #9bdeb6; /* gains */
+  --color-positive-bg: #204b3a;
+  --color-negative: #f49a9f; /* losses */
+  --color-burgundy: #742c3c;
+  --color-burgundy-dark: #4c252b;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Playing-card suits */
+  --color-suit-black: #d6bc7a; /* spade and club icons */
+  --color-suit-red: #e29499; /* heart and diamond icons */
+  --color-brand-ink: #173326; /* spade inside the gold brand mark */
+
+  /* Loading placeholders */
+  --color-skeleton-panel: #15372b;
+  --color-skeleton: #315645;
+
+  /* Fonts: the variables are set by next/font in layout.tsx */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-playfair), ui-serif, Georgia, serif;
+
+  /* Type sizes from the design (12px and 14px use Tailwind's text-xs and text-sm) */
+  --text-hero: 54px;
+  --text-display: 40px;
+  --text-h2: 28px;
+  --text-h3: 26px;
+  --text-h4: 24px;
+  --text-card: 21px;
+  --text-lead: 17px;
+  --text-body: 15px;
+  --text-small: 13px;
+  --text-label: 11px;
+  --text-micro: 10px;
+
+  /* Corner radius. Tailwind's defaults already match the design:
+     rounded-md 6px, rounded-lg 8px, rounded-xl 12px, rounded-2xl 16px. Only 9px is new. */
+  --radius-toggle: 9px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-page);
+  color: var(--color-cream);
 }
