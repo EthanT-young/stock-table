@@ -13,6 +13,10 @@ import {
   CompanyOverview,
   CompanyOverviewSkeleton,
 } from "@/components/stock/company-overview";
+import {
+  PriceHistory,
+  PriceHistorySkeleton,
+} from "@/components/stock/price-history";
 import { findTicker } from "@/lib/tickers";
 
 // Render on every request: prices change daily and our own cache (src/lib/alphavantage)
@@ -87,14 +91,11 @@ export default async function StockPage({
             </Suspense>
           </div>
 
-          <section className="order-2 rounded-xl border border-border bg-surface p-6 lg:order-3 lg:col-span-2">
-            <h2 className="font-display text-h3 text-cream">Daily history</h2>
-            <div className="mt-6 space-y-3">
-              {[0, 1, 2, 3, 4].map((row) => (
-                <Skeleton key={row} className="h-4 w-full" />
-              ))}
-            </div>
-          </section>
+          <div className="order-2 lg:order-3 lg:col-span-2">
+            <Suspense fallback={<PriceHistorySkeleton />}>
+              <PriceHistory symbol={ticker.symbol} />
+            </Suspense>
+          </div>
         </div>
 
         <section className="mt-8 rounded-xl bg-burgundy p-5 text-cream">

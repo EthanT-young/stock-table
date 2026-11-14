@@ -112,3 +112,14 @@ body {
     animation: none;
   }
 }
+
+/* Thin gold scrollbar for the price history box, as in the design. */
+.history-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gold) var(--color-line);
+}
+
+.history-scroll:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: -2px;
+}
