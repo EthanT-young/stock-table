@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { DealButton } from "@/components/directory/deal-button";
 import { StockCard } from "@/components/stock-card";
 import {
   ALL_SECTORS,
@@ -99,7 +100,7 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
         aria-labelledby="discovery-heading"
         className="mt-4 rounded-md border border-border-strong bg-crimson-gradient p-5 md:mt-6 md:px-6"
       >
-        <div className="flex flex-col gap-4 xl:grid xl:grid-cols-[1fr_566px] xl:items-start">
+        <div className="flex flex-col gap-4 xl:grid xl:grid-cols-[1fr_minmax(0,566px)_292px] xl:items-start">
           <div>
             <h2
               id="discovery-heading"
@@ -139,6 +140,8 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
               {shortcut}
             </kbd>
           </div>
+
+          <DealButton />
         </div>
 
         <p className="mt-5 text-micro font-semibold tracking-[0.8px] text-ivory">
