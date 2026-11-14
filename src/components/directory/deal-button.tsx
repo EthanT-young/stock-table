@@ -87,20 +87,30 @@ export function DealButton() {
           clearTimers(); // closing (Esc or Cancel) cancels the deal
           setDeal(null);
         }}
-        className="m-auto w-[min(92vw,380px)] rounded-md border border-border bg-surface p-6 text-ink shadow-2xl backdrop:bg-ink/60"
+        className="relative m-auto w-[min(92vw,380px)] rounded-md border border-border bg-surface p-6 text-ink shadow-2xl backdrop:bg-ink/60"
       >
-        <div className="flex items-start justify-between gap-4">
-          <h2 id="deal-heading" className="font-display text-h4 text-crimson">
-            Dealing you a company
-          </h2>
-          <button
-            type="button"
-            onClick={() => dialogRef.current?.close()}
-            className="rounded-md px-2 py-1 text-small font-medium text-muted hover:text-ink"
-          >
-            Cancel
-          </button>
-        </div>
+        {/* Close button in the corner; the heading is centered with room on both sides. */}
+        <button
+          type="button"
+          onClick={() => dialogRef.current?.close()}
+          aria-label="Cancel"
+          className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full text-muted transition-colors hover:bg-raised hover:text-ink"
+        >
+          <svg aria-hidden width="14" height="14" viewBox="0 0 14 14">
+            <path
+              d="M1 1l12 12M13 1L1 13"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+        <h2
+          id="deal-heading"
+          className="px-8 text-center font-display text-h4 text-crimson"
+        >
+          Spinning the wheel
+        </h2>
 
         {deal && (
           <div className="mt-6 flex justify-center">

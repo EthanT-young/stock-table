@@ -290,7 +290,7 @@ body {
   animation: roulette-appear 0.3s ease-out 2.6s both;
 }
 
-/* The "No more bets…" caption: until landing. */
+/* The "Place your bets…" caption: until landing. */
 .roulette-before-landing {
   animation: roulette-disappear 0.2s ease-out 2.6s both;
 }
