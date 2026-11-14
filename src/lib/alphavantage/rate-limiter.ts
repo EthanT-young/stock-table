@@ -42,6 +42,8 @@ const realSleep: Sleep = (ms) =>
 export class RateLimiter {
   /** Start times of granted requests (past and reserved future ones), oldest first. */
   private grantedAt: number[] = [];
+  /** No request may start before this time (set by pauseFor). */
+  private pausedUntil = 0;
 
   constructor(
     private readonly limits: RateLimits = FREE_TIER_LIMITS,
@@ -62,7 +64,7 @@ export class RateLimiter {
       return Infinity; // assume the day is rolling: wait for the oldest to expire
     }
 
-    let earliest = currentTime;
+    let earliest = Math.max(currentTime, this.pausedUntil);
     const last = this.grantedAt[this.grantedAt.length - 1];
     if (last !== undefined) {
       earliest = Math.max(earliest, last + minSpacingMs);
@@ -74,6 +76,15 @@ export class RateLimiter {
       earliest = Math.max(earliest, oldestInWindow + MINUTE_MS);
     }
     return earliest;
+  }
+
+  /**
+   * Stops granting slots for `ms` milliseconds. Used when AlphaVantage itself says we are
+   * rate limited (for example because another server instance used up the allowance),
+   * so we don't keep sending requests that will be refused.
+   */
+  pauseFor(ms: number): void {
+    this.pausedUntil = Math.max(this.pausedUntil, this.now() + ms);
   }
 
   /**

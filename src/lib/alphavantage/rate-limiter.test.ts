@@ -68,6 +68,15 @@ describe("RateLimiter", () => {
     expect(await limiter.acquire(LONG_WAIT)).toBe(true);
   });
 
+  it("grants nothing while paused, then resumes", async () => {
+    const clock = fakeClock();
+    const limiter = new RateLimiter(LIMITS, clock.now, clock.sleep);
+    limiter.pauseFor(60_000);
+    expect(await limiter.acquire(3000)).toBe(false);
+    clock.advance(60_000);
+    expect(await limiter.acquire(NO_WAIT)).toBe(true);
+  });
+
   it("never gives two waiting callers the same slot", async () => {
     const clock = fakeClock();
     const startTimes: number[] = [];
