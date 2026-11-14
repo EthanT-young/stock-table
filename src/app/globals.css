@@ -65,3 +65,50 @@ body {
   background: var(--color-page);
   color: var(--color-cream);
 }
+
+/*
+ * Loading placeholders: a soft highlight sweeps across each grey bar ("shimmer").
+ * People who ask their system for reduced motion get still bars instead.
+ */
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton) 25%,
+    color-mix(in srgb, var(--color-skeleton), var(--color-cream) 12%) 50%,
+    var(--color-skeleton) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* Loading indicators fade in after 0.3 s, so very fast loads never flash them. */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in-late {
+  animation: fade-in 0.3s ease-out 0.3s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+  .fade-in-late {
+    animation: none;
+  }
+}
