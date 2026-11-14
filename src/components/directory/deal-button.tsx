@@ -13,7 +13,7 @@ import { TICKERS } from "@/lib/tickers";
 const SHOW_RESULT_MS = 900;
 
 /**
- * "Deal me a company": opens an overlay where the roulette spins and lands on a random
+ * "Spin for a company": opens an overlay where the roulette spins and lands on a random
  * company from the collection, then opens that company's page.
  *
  * The overlay is a native <dialog> opened with showModal(): the browser keeps keyboard
@@ -77,7 +77,7 @@ export function DealButton() {
           width={20}
           height={20}
         />
-        Deal me a company
+        Spin for a company
       </button>
 
       <dialog

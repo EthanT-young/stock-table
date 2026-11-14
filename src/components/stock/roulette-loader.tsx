@@ -49,7 +49,7 @@ function PocketLabel({ index, color }: { index: number; color: string }) {
  * "Dealing AAPL…". The animation itself is CSS (see globals.css), so it starts as soon as
  * the wheel appears, with no JavaScript needed. Decorative: screen readers skip it.
  *
- * Used by the chart's loading state and by the "Deal me a company" overlay.
+ * Used by the chart's loading state and by the "Spin for a company" overlay.
  */
 export function RouletteWheel({
   symbol,
