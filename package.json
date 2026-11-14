@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "logos": "tsx scripts/download-logos.ts"
+    "logos": "tsx scripts/download-logos.ts",
+    "snapshot": "tsx scripts/snapshot.ts"
   },
   "dependencies": {
     "@vercel/functions": "3.10.5",
