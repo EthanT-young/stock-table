@@ -72,8 +72,28 @@ describe("pricesInRange", () => {
     expect(pricesInRange(months, "3M")).toHaveLength(4);
   });
 
-  it("100D keeps everything", () => {
-    expect(pricesInRange(months, "100D")).toHaveLength(5);
+  it("5D keeps the latest trading day and the 5 before it", () => {
+    const week: DailyPrice[] = [
+      "2026-11-13",
+      "2026-11-12",
+      "2026-11-11",
+      "2026-11-10",
+      "2026-11-09",
+      "2026-11-06", // the Friday before (weekend not in the data)
+      "2026-11-05",
+    ].map((date) => ({ date, close: 1, volume: 1 }));
+    expect(pricesInRange(week, "5D").map((d) => d.date)).toEqual([
+      "2026-11-13",
+      "2026-11-12",
+      "2026-11-11",
+      "2026-11-10",
+      "2026-11-09",
+      "2026-11-06",
+    ]);
+  });
+
+  it("5D keeps whatever there is when fewer days exist", () => {
+    expect(pricesInRange(months.slice(0, 2), "5D")).toHaveLength(2);
   });
 
   it("handles empty input", () => {

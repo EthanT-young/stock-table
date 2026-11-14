@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Design tokens from the Figma design ("Test Design", white and royal red theme).
+ * Design tokens from the Figma design ("Stock Table", white and royal red theme).
  *
  * Tailwind turns each token into utility classes: --color-crimson gives bg-crimson,
  * text-crimson, border-crimson...; --text-hero gives text-hero; --font-display gives
@@ -15,7 +15,7 @@
   --color-surface-alt: #fcf9f4; /* alternate table rows */
   --color-raised: #f5f0e9; /* chips, badges, the "est." button */
   --color-table-header: #f4ede4;
-  --color-track: #f1eae1; /* track behind the 1M / 3M / 100D buttons */
+  --color-track: #f1eae1; /* track behind the 5D / 1M / 3M buttons */
   --color-kbd: #f3ede6; /* the "⌘ K" keyboard hint */
   --color-panel-404: #fbf6f0;
   --color-line: #e4dbd0; /* grid lines, dividers, scroll track */

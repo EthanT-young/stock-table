@@ -24,7 +24,7 @@ import {
   type DailyPrice,
 } from "@/lib/prices";
 
-const RANGES: ChartRange[] = ["1M", "3M", "100D"];
+const RANGES: ChartRange[] = ["5D", "1M", "3M"];
 
 /** True when the visitor's system asks for reduced motion (then the chart doesn't animate). */
 function usePrefersReducedMotion(): boolean {
@@ -57,7 +57,7 @@ function ChartTooltip({ active, payload }: TooltipContentProps) {
 }
 
 /**
- * The price chart with its 1M / 3M / 100D buttons. All 100 days arrive with the page; the
+ * The price chart with its 5D / 1M / 3M buttons. All 100 days arrive with the page; the
  * buttons only filter them in the browser, so switching range makes no API request.
  */
 export function PriceChart({
@@ -66,7 +66,7 @@ export function PriceChart({
   /** Newest first, as stored. */
   prices: DailyPrice[];
 }) {
-  const [range, setRange] = useState<ChartRange>("100D");
+  const [range, setRange] = useState<ChartRange>("3M");
   const reducedMotion = usePrefersReducedMotion();
 
   const inRange = pricesInRange(prices, range);

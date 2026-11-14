@@ -50,19 +50,26 @@ export function withDailyChange(
 }
 
 /** The chart range buttons. */
-export type ChartRange = "1M" | "3M" | "100D";
+export type ChartRange = "5D" | "1M" | "3M";
+
+/** 5D covers five trading days of change: the latest day plus the five before it. */
+const FIVE_DAY_POINTS = 6;
 
 /**
  * Returns the prices that fall inside a chart range, still newest first.
- * 1M and 3M count calendar months back from the latest trading day;
- * 100D is everything we have (the free tier returns the latest 100 trading days).
+ * 5D is the latest trading day and the 5 before it (weekends and holidays aren't in the
+ * data, so this is a trading week). 1M and 3M count calendar months back from the latest
+ * trading day.
  */
 export function pricesInRange(
   newestFirst: readonly DailyPrice[],
   range: ChartRange,
 ): DailyPrice[] {
-  if (range === "100D" || newestFirst.length === 0) {
-    return [...newestFirst];
+  if (range === "5D") {
+    return newestFirst.slice(0, FIVE_DAY_POINTS);
+  }
+  if (newestFirst.length === 0) {
+    return [];
   }
   const monthsBack = range === "1M" ? 1 : 3;
   const cutoff = new Date(newestFirst[0].date); // latest trading day, midnight UTC
@@ -74,7 +81,7 @@ export function pricesInRange(
 
 /**
  * Percent change across a whole range: from the oldest close in the range to the
- * latest. Drives the "+12.84% in 100D" badge. Null if there are fewer than 2 days.
+ * latest. Drives the "+4.40% in 1M" badge. Null if there are fewer than 2 days.
  */
 export function rangeChangePercent(
   newestFirstInRange: readonly DailyPrice[],
