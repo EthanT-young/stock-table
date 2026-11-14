@@ -80,7 +80,7 @@ export function PriceChart({
   const lineColor = rising ? "var(--color-positive)" : "var(--color-negative)";
 
   return (
-    <section className="flex min-h-[374px] flex-col rounded-md border border-border bg-surface p-5 md:p-6 lg:min-h-[408px]">
+    <section className="blur-fade-in flex min-h-[374px] flex-col rounded-md border border-border bg-surface p-5 md:p-6 lg:min-h-[408px]">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-label font-semibold text-muted">

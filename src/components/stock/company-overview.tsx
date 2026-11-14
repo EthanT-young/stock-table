@@ -30,7 +30,7 @@ export async function CompanyOverview({ symbol }: { symbol: string }) {
   const latestClose = prices?.[0]?.close ?? null;
 
   return (
-    <section className="relative flex h-full flex-col rounded-md border border-border bg-ivory-gradient p-5 md:p-6">
+    <section className="blur-fade-in relative flex h-full flex-col rounded-md border border-border bg-ivory-gradient p-5 md:p-6">
       <CornerBrackets size={10} inset={7} opacity={0.42} />
       <h2 className="font-display text-h4 text-crimson">Behind the ticker</h2>
 

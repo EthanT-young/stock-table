@@ -15,7 +15,7 @@ export async function CompanyIdentity({ symbol }: { symbol: string }) {
   const name = profile.name ?? NOT_AVAILABLE;
 
   return (
-    <div>
+    <div className="blur-fade-in">
       <div className="flex items-start gap-4">
         <LogoTile symbol={symbol} name={name} size={64} />
         <div className="min-w-0">

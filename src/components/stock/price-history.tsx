@@ -20,9 +20,17 @@ function changeColor(changePercent: number | null): string {
 }
 
 /** The panel frame and heading, shared by the table and its loading placeholder. */
-function HistoryPanel({ children }: { children: React.ReactNode }) {
+function HistoryPanel({
+  className = "",
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <section className="overflow-hidden rounded-md border border-border bg-surface">
+    <section
+      className={`overflow-hidden rounded-md border border-border bg-surface ${className}`}
+    >
       <div className="flex flex-wrap items-start justify-between gap-3 p-5 md:p-6">
         <div>
           <h2 className="font-display text-[24px] text-crimson md:text-h3">
@@ -47,7 +55,7 @@ export async function PriceHistory({ symbol }: { symbol: string }) {
   const prices = await loadPrices(symbol);
   if (!prices) {
     return (
-      <HistoryPanel>
+      <HistoryPanel className="blur-fade-in">
         <p className="px-6 pb-6 text-body text-muted">
           Price history isn&rsquo;t available right now. Please try again later.
         </p>
@@ -57,7 +65,7 @@ export async function PriceHistory({ symbol }: { symbol: string }) {
   const rows = withDailyChange(prices);
 
   return (
-    <HistoryPanel>
+    <HistoryPanel className="blur-fade-in">
       {/* tabIndex lets keyboard users focus the box and scroll it with the arrow keys. */}
       <div
         tabIndex={0}
