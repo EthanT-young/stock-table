@@ -3,8 +3,9 @@
  *
  * The logos come from AlphaVantage's logo server (cdn.alphavantage.co). It needs no API
  * key and does not count against the 25-requests-per-day quota. We save copies in the
- * repo so the site never depends on that server at runtime (Q10). A ticker without a
- * logo file falls back to an initials badge in the UI.
+ * repo so the logos load from our own site: they keep working if that server is slow
+ * or down, and pages don't wait on a third-party server. A ticker without a logo file
+ * falls back to an initials badge in the UI.
  */
 
 import { mkdir, writeFile } from "node:fs/promises";

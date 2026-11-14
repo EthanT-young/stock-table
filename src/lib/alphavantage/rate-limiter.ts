@@ -9,8 +9,10 @@
  * get `false` back and use cached or snapshot data instead.
  *
  * Limitation: the counts live in this server process's memory. On Vercel several
- * instances may run at once, each with its own counts (accepted in Q39; AlphaVantage's
- * own rate-limit response is still detected and handled).
+ * instances may run at once, each with its own counts. Sharing one count between them
+ * would need an external database (such as Redis), which isn't worth it at this app's
+ * traffic. If the instances together do go over the limit, AlphaVantage answers with a
+ * rate-limit message, which we detect, and the page shows stored data instead.
  */
 
 export interface RateLimits {
