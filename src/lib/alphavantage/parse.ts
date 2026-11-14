@@ -78,7 +78,7 @@ export function findProblem(body: unknown): Problem | null {
 }
 
 /** Throws an AlphaVantageError if the body is an error or limit message. */
-function throwIfProblem(body: unknown): void {
+export function throwIfProblem(body: unknown): void {
   const problem = findProblem(body);
   if (problem) {
     throw new AlphaVantageError(problem);
