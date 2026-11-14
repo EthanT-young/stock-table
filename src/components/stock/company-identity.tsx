@@ -19,7 +19,7 @@ export async function CompanyIdentity({ symbol }: { symbol: string }) {
       <div className="flex items-start gap-4">
         <LogoTile symbol={symbol} name={name} size={64} />
         <div className="min-w-0">
-          <h1 className="font-display text-[30px] leading-tight text-cream md:text-display">
+          <h1 className="font-display text-[30px] leading-tight text-crimson md:text-[44px]">
             {name}
           </h1>
           <p className="mt-1 text-xs font-medium text-muted md:text-small">
@@ -29,7 +29,7 @@ export async function CompanyIdentity({ symbol }: { symbol: string }) {
         </div>
       </div>
       <div className="mt-4 flex flex-wrap gap-2.5">
-        <p className="rounded-xl bg-raised px-3 py-2 text-xs font-medium text-gold">
+        <p className="rounded-xl bg-raised px-3 py-2 text-xs font-medium text-gold-ink">
           {profile.sector
             ? toSentenceCase(profile.sector)
             : `Sector ${NOT_AVAILABLE}`}

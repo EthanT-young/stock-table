@@ -1,5 +1,6 @@
 import { loadPrices, loadProfile } from "@/app/stock/[symbol]/data";
 import { BackupLabel } from "@/components/backup-label";
+import { CornerBrackets } from "@/components/corner-brackets";
 import { Skeleton } from "@/components/skeleton";
 import { MarketCapValue } from "@/components/stock/market-cap-value";
 import { NOT_AVAILABLE, toSentenceCase } from "@/lib/format";
@@ -15,7 +16,7 @@ function Field({
   return (
     <div>
       <dt className="text-micro font-semibold text-muted">{label}</dt>
-      <dd className="mt-1 text-body font-medium text-cream">{children}</dd>
+      <dd className="mt-1 text-body font-medium text-ink">{children}</dd>
     </div>
   );
 }
@@ -30,9 +31,10 @@ export async function CompanyOverview({ symbol }: { symbol: string }) {
   const latestClose = prices?.value[0]?.close ?? null;
 
   return (
-    <section className="flex h-full flex-col rounded-xl border border-border bg-raised p-5 md:p-6">
+    <section className="relative flex h-full flex-col rounded-md border border-border bg-ivory-gradient p-5 md:p-6">
+      <CornerBrackets size={10} inset={7} opacity={0.42} />
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-display text-h4 text-cream">Behind the ticker</h2>
+        <h2 className="font-display text-h4 text-crimson">Behind the ticker</h2>
         <BackupLabel backupFrom={backupFrom} />
       </div>
 
@@ -82,7 +84,7 @@ export async function CompanyOverview({ symbol }: { symbol: string }) {
 
 export function CompanyOverviewSkeleton() {
   return (
-    <section className="fade-in-late h-full rounded-xl border border-border bg-raised p-5 md:p-6">
+    <section className="fade-in-late relative h-full rounded-md border border-border bg-ivory-gradient p-5 md:p-6">
       <Skeleton className="h-7 w-48" />
       <div className="mt-6 space-y-5">
         {["w-3/4", "w-1/2", "w-2/3", "w-1/3"].map((width) => (

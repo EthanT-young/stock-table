@@ -1,43 +1,73 @@
 @import "tailwindcss";
 
 /*
- * Design tokens from the Figma design ("Test Design").
+ * Design tokens from the Figma design ("Test Design", white and royal red theme).
  *
- * Tailwind turns each token into utility classes: --color-gold gives bg-gold, text-gold,
- * border-gold...; --text-hero gives text-hero; --font-display gives font-display.
- * Change a value here and every component using it follows.
+ * Tailwind turns each token into utility classes: --color-crimson gives bg-crimson,
+ * text-crimson, border-crimson...; --text-hero gives text-hero; --font-display gives
+ * font-display. Change a value here and every component using it follows.
  */
 @theme {
-  /* Backgrounds, darkest to lightest */
-  --color-page: #071b16;
-  --color-track: #071f18; /* track behind the 1M / 3M / 100D buttons */
-  --color-surface: #102b23; /* nav bar, cards, table rows */
-  --color-surface-alt: #143227; /* alternate table rows */
-  --color-raised: #153d30; /* hero, "Behind the ticker", chips */
-  --color-table-header: #1a3c2d;
-  --color-line: #345246; /* grid lines, dividers, scroll track */
-  --color-border: rgb(113 97 60 / 0.62); /* card outlines */
-  --color-border-hero: rgb(181 155 97 / 0.7); /* dashed hero outline */
+  /* Backgrounds */
+  --color-page: #fffcf8; /* warm white page background */
+  --color-nav: #ffffff; /* top bar */
+  --color-surface: #ffffff; /* cards, chart and table panels */
+  --color-surface-alt: #fcf9f4; /* alternate table rows */
+  --color-raised: #f5f0e9; /* chips, badges, the "est." button */
+  --color-table-header: #f4ede4;
+  --color-track: #f1eae1; /* track behind the 1M / 3M / 100D buttons */
+  --color-kbd: #f3ede6; /* the "⌘ K" keyboard hint */
+  --color-note: #f8f2e7; /* "A focused window" note */
+  --color-panel-404: #fbf6f0;
+  --color-line: #e4dbd0; /* grid lines, dividers, scroll track */
+
+  /* Outlines */
+  --color-border: rgb(217 204 184 / 0.38); /* card outlines */
+  --color-border-strong: rgb(197 166 110 / 0.85); /* hero and discovery bar */
+  --color-note-border: rgb(207 183 139 / 0.7);
+  --color-input-border: rgb(212 196 176 / 0.7);
+  --color-chip-border: rgb(215 189 160 / 0.7);
 
   /* Text and accents */
-  --color-cream: #f5eedb; /* main text, playing cards, logo tiles */
-  --color-muted: #a9bdb0; /* secondary text, labels */
-  --color-gold: #e8c779; /* accent, selected button */
-  --color-on-gold: #17271c; /* text on gold backgrounds */
-  --color-positive: #9bdeb6; /* gains */
-  --color-positive-bg: #204b3a;
-  --color-negative: #f49a9f; /* losses */
-  --color-burgundy: #742c3c;
-  --color-burgundy-dark: #4c252b;
+  --color-ink: #292328; /* main text */
+  --color-muted: #6e6367; /* secondary text (a shade darker than the design's #756a6e,
+                             so it reads clearly on every beige background: WCAG AA) */
+  --color-crimson: #981b32; /* royal red: brand, headings, names, selected buttons */
+  --color-on-crimson: #ffffff;
+  --color-gold-ink: #806438; /* small gold labels: sector chip, API label, "404" */
+  --color-gold: #ba9c6c; /* thin gold lines: corner brackets */
+  --color-gold-rim: #bca071; /* roulette rim and dividers */
+  --color-gold-light: #f0e1be; /* the roulette's landed pocket */
+  --color-on-gold: #392a19; /* text on gold */
+  --color-logo-tile: #f5eedb; /* background behind company logos */
 
-  /* Playing-card suits */
-  --color-suit-black: #d6bc7a; /* spade and club icons */
-  --color-suit-red: #e29499; /* heart and diamond icons */
-  --color-brand-ink: #173326; /* spade inside the gold brand mark */
+  /* On the crimson hero and discovery bar */
+  --color-ivory: #fff9f1;
+  --color-hero-heading: #f3ebdd;
+  --color-hero-italic: #e4cfab;
+  --color-chip-bg: #85172b; /* sector filter chips */
+  --color-chip-active-bg: #fff8ed;
+
+  /* Gains and losses (darker shades that read well on white) */
+  --color-positive: #247054;
+  --color-positive-bg: #f5f0e9;
+  --color-negative: #b02b41;
+  --color-negative-bg: #f5f0e9;
+
+  /* Ticker pills, one shade per suit */
+  --color-pill-spade: #f5f0e9;
+  --color-pill-heart: #f5f0e9;
+  --color-pill-club: #f7f2e8;
+  --color-pill-diamond: #fbf6f0;
+  --color-pill-text: #292328;
+
+  /* Roulette pockets: classic red and black */
+  --color-roulette-red: #981b32;
+  --color-roulette-black: #292328;
 
   /* Loading placeholders */
-  --color-skeleton-panel: #15372b;
-  --color-skeleton: #315645;
+  --color-skeleton-panel: #f5f0e9;
+  --color-skeleton: #ddd2c3;
 
   /* Fonts: the variables are set by next/font in layout.tsx */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -56,14 +86,28 @@
   --text-label: 11px;
   --text-micro: 10px;
 
-  /* Corner radius. Tailwind's defaults already match the design:
-     rounded-md 6px, rounded-lg 8px, rounded-xl 12px, rounded-2xl 16px. Only 9px is new. */
+  /* Corner radius. Tailwind's defaults cover most of the design (rounded-md 6px,
+     rounded-lg 8px, rounded-xl 12px, rounded-2xl 16px); these are the extra ones. */
   --radius-toggle: 9px;
+  --radius-chip: 5px;
+}
+
+/* Gradients from the design, usable as classes (e.g. class="bg-gold-gradient"). */
+@utility bg-gold-gradient {
+  background-image: linear-gradient(90deg, #a98c61, #f0e1be 50%, #bca071);
+}
+
+@utility bg-crimson-gradient {
+  background-image: linear-gradient(90deg, #a5213a, #80152b);
+}
+
+@utility bg-ivory-gradient {
+  background-image: linear-gradient(90deg, #fffcf7, #f4ebdd);
 }
 
 body {
   background: var(--color-page);
-  color: var(--color-cream);
+  color: var(--color-ink);
 }
 
 /*
@@ -83,7 +127,7 @@ body {
   background: linear-gradient(
     90deg,
     var(--color-skeleton) 25%,
-    color-mix(in srgb, var(--color-skeleton), var(--color-cream) 12%) 50%,
+    color-mix(in srgb, var(--color-skeleton), white 45%) 50%,
     var(--color-skeleton) 75%
   );
   background-size: 200% 100%;
@@ -113,14 +157,14 @@ body {
   }
 }
 
-/* Thin gold scrollbar for the price history box, as in the design. */
+/* Thin crimson scrollbar for the price history box, as in the design. */
 .history-scroll {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-gold) var(--color-line);
+  scrollbar-color: var(--color-crimson) var(--color-line);
 }
 
 .history-scroll:focus-visible {
-  outline: 2px solid var(--color-gold);
+  outline: 2px solid var(--color-crimson);
   outline-offset: -2px;
 }
 

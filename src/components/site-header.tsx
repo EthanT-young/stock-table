@@ -4,10 +4,10 @@ import Link from "next/link";
 /** The bar at the top of every page: brand on the left, "Explore stocks" on the right. */
 export function SiteHeader({ showTagline = false }: { showTagline?: boolean }) {
   return (
-    <header className="bg-surface">
+    <header className="relative bg-nav">
       <div className="mx-auto flex h-19 w-full max-w-[1440px] items-center gap-6 px-5 md:h-24 md:px-16">
         <Link href="/" className="flex items-center gap-2.5 rounded-lg">
-          <span className="flex size-[27px] items-center justify-center rounded-lg bg-gold">
+          <span className="flex size-[27px] items-center justify-center rounded-lg bg-gold-gradient">
             <Image
               src="/suits/brand-spade.svg"
               alt=""
@@ -16,13 +16,13 @@ export function SiteHeader({ showTagline = false }: { showTagline?: boolean }) {
               height={20}
             />
           </span>
-          <span className="font-display text-h3 text-cream">Test Design</span>
+          <span className="font-display text-h3 text-crimson">Test Design</span>
         </Link>
         <nav className="ml-auto flex items-center gap-10">
           {/* <Link> navigates inside the app without a full page reload. */}
           <Link
             href="/#collection"
-            className="rounded-xl bg-raised px-3 py-2 text-xs font-medium text-gold"
+            className="rounded-xl bg-crimson px-3 py-2 text-xs font-medium text-on-crimson"
           >
             Explore stocks
           </Link>
@@ -33,6 +33,11 @@ export function SiteHeader({ showTagline = false }: { showTagline?: boolean }) {
           )}
         </nav>
       </div>
+      {/* Thin gold line along the bottom of the bar */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-px bg-gold-gradient opacity-45"
+      />
     </header>
   );
 }

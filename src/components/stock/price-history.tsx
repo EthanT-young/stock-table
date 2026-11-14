@@ -29,10 +29,10 @@ function HistoryPanel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-xl border border-border bg-surface">
+    <section className="overflow-hidden rounded-md border border-border bg-surface">
       <div className="flex flex-wrap items-start justify-between gap-3 p-5 md:p-6">
         <div>
-          <h2 className="font-display text-[24px] text-cream md:text-h3">
+          <h2 className="font-display text-[24px] text-crimson md:text-h3">
             Daily history
           </h2>
           <p className="mt-1 text-xs text-muted">
@@ -41,7 +41,7 @@ function HistoryPanel({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <BackupLabel backupFrom={backupFrom} />
-          <p className="hidden rounded-xl bg-raised px-3 py-2 text-xs font-medium text-gold sm:block">
+          <p className="hidden rounded-xl bg-raised px-3 py-2 text-xs font-medium text-gold-ink sm:block">
             TIME_SERIES_DAILY · compact
           </p>
         </div>
@@ -105,7 +105,7 @@ export async function PriceHistory({ symbol }: { symbol: string }) {
               </th>
             </tr>
           </thead>
-          <tbody className="text-sm text-cream tabular-nums">
+          <tbody className="text-sm text-ink tabular-nums">
             {rows.map((row) => (
               <tr
                 key={row.date}

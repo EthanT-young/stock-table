@@ -26,12 +26,12 @@ export function LogoTile({
 
   return (
     <span
-      className={`flex shrink-0 items-center justify-center overflow-hidden bg-cream ${radius}`}
+      className={`flex shrink-0 items-center justify-center overflow-hidden bg-logo-tile ${radius}`}
       style={{ width: size, height: size }}
     >
       {failed ? (
         <span
-          className="font-display font-medium text-on-gold"
+          className="font-display font-medium text-crimson"
           style={{ fontSize: size * 0.36 }}
           aria-label={`${name} logo`}
         >

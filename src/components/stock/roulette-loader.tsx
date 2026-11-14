@@ -55,7 +55,7 @@ export function RouletteLoader({ symbol }: { symbol: string }) {
   const landingDeg = FULL_TURNS * 360 + (360 - (index + 0.5) * POCKET_DEG);
 
   return (
-    <section className="flex min-h-[374px] flex-col rounded-xl border border-border bg-surface p-6 lg:min-h-[408px]">
+    <section className="flex min-h-[374px] flex-col rounded-md border border-border bg-surface p-6 lg:min-h-[408px]">
       <p className="text-label font-semibold text-muted">PRICE PERFORMANCE</p>
       <p role="status" className="sr-only">
         Loading the price chart for {symbol}
@@ -67,7 +67,7 @@ export function RouletteLoader({ symbol }: { symbol: string }) {
       >
         <div className="relative" style={{ width: SIZE, height: SIZE }}>
           {/* Pointer */}
-          <div className="absolute -top-1.5 left-1/2 z-10 -translate-x-1/2 border-x-8 border-t-[14px] border-x-transparent border-t-gold" />
+          <div className="absolute -top-1.5 left-1/2 z-10 -translate-x-1/2 border-x-8 border-t-[14px] border-x-transparent border-t-gold-rim" />
 
           <svg
             width={SIZE}
@@ -80,7 +80,7 @@ export function RouletteLoader({ symbol }: { symbol: string }) {
               cx={RADIUS}
               cy={RADIUS}
               r={RADIUS - 1}
-              fill="var(--color-gold)"
+              fill="var(--color-gold-rim)"
             />
             {TICKERS.map((ticker, i) => (
               <g key={ticker.symbol}>
@@ -88,20 +88,20 @@ export function RouletteLoader({ symbol }: { symbol: string }) {
                   d={pocketPath(i)}
                   fill={
                     i % 2 === 0
-                      ? "var(--color-positive-bg)"
-                      : "var(--color-burgundy)"
+                      ? "var(--color-roulette-red)"
+                      : "var(--color-roulette-black)"
                   }
-                  stroke="var(--color-gold)"
+                  stroke="var(--color-gold-rim)"
                 />
-                <PocketLabel index={i} color="var(--color-cream)" />
+                <PocketLabel index={i} color="var(--color-ivory)" />
               </g>
             ))}
             {/* This company's pocket, turned gold once the wheel has landed. */}
             <g className="roulette-after-landing">
               <path
                 d={pocketPath(index)}
-                fill="var(--color-gold)"
-                stroke="var(--color-gold)"
+                fill="var(--color-gold-light)"
+                stroke="var(--color-gold-rim)"
               />
               <PocketLabel index={index} color="var(--color-on-gold)" />
             </g>
@@ -110,14 +110,14 @@ export function RouletteLoader({ symbol }: { symbol: string }) {
               cy={RADIUS}
               r={34}
               fill="var(--color-surface)"
-              stroke="var(--color-gold)"
+              stroke="var(--color-gold-rim)"
               strokeWidth={2}
             />
           </svg>
 
           {/* Ball: circles the other way and settles at the top, above the pocket. */}
           <div className="roulette-ball absolute inset-0">
-            <div className="absolute top-[5px] left-1/2 size-3 -translate-x-1/2 rounded-full bg-cream shadow-[0_0_6px_var(--color-gold)]" />
+            <div className="absolute top-[5px] left-1/2 size-3 -translate-x-1/2 rounded-full bg-ivory shadow-[0_0_6px_var(--color-gold-rim)]" />
           </div>
 
           <Image

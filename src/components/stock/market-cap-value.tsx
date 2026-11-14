@@ -35,7 +35,7 @@ export function MarketCapValue({
       <button
         type="button"
         popoverTarget={popoverId}
-        className="ml-1 rounded-md bg-track px-1.5 py-0.5 text-label font-semibold text-gold underline decoration-dotted underline-offset-2"
+        className="ml-1 rounded-md bg-track px-1.5 py-0.5 text-label font-semibold text-gold-ink underline decoration-dotted underline-offset-2"
         aria-label="Estimated market cap: how it is calculated"
       >
         est.
@@ -43,7 +43,7 @@ export function MarketCapValue({
       <span
         id={popoverId}
         popover="auto"
-        className="m-auto max-w-sm rounded-xl border border-border bg-surface p-4 text-small text-cream shadow-xl backdrop:bg-black/40"
+        className="m-auto max-w-sm rounded-xl border border-border bg-surface p-4 text-small text-ink shadow-xl backdrop:bg-black/40"
       >
         <strong className="block font-semibold">Estimated market cap</strong>
         <span className="mt-2 block text-muted">

@@ -48,9 +48,9 @@ function ChartTooltip({ active, payload }: TooltipContentProps) {
   }
   const day = payload[0].payload as DailyPrice;
   return (
-    <div className="rounded-xl border border-border bg-page px-3 py-2 text-xs shadow-lg">
+    <div className="rounded-xl border border-border bg-surface px-3 py-2 text-xs shadow-lg">
       <p className="text-muted">{formatDate(day.date)}</p>
-      <p className="mt-0.5 text-sm font-semibold text-cream">
+      <p className="mt-0.5 text-sm font-semibold text-ink">
         {formatUsd(day.close)}
       </p>
     </div>
@@ -77,15 +77,13 @@ export function PriceChart({
   const chartData = [...inRange].reverse(); // charts draw left to right, oldest first
   const latest = prices[0];
   const rising = change !== null && change >= 0;
-  // The chart takes the colour of the selected range: green if the price went up over
-  // it, red if it went down. (Written out in full so Tailwind keeps both colour tokens.)
+  // The chart takes the color of the selected range: green if the price went up over it,
+  // red if it went down, with a light tint of the same color under the line. (Written out
+  // in full so Tailwind keeps both color tokens.)
   const lineColor = rising ? "var(--color-positive)" : "var(--color-negative)";
-  const areaColor = rising
-    ? "var(--color-raised)"
-    : "var(--color-burgundy-dark)";
 
   return (
-    <section className="flex min-h-[374px] flex-col rounded-xl border border-border bg-surface p-5 md:p-6 lg:min-h-[408px]">
+    <section className="flex min-h-[374px] flex-col rounded-md border border-border bg-surface p-5 md:p-6 lg:min-h-[408px]">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -95,7 +93,7 @@ export function PriceChart({
             <BackupLabel backupFrom={backupFrom} />
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-4">
-            <p className="text-[34px] leading-none font-semibold text-cream md:text-display">
+            <p className="text-[34px] leading-none font-semibold text-ink md:text-display">
               {formatUsd(latest.close)}
             </p>
             {change !== null && (
@@ -103,7 +101,7 @@ export function PriceChart({
                 className={`rounded-xl px-3 py-2 text-xs font-medium ${
                   rising
                     ? "bg-positive-bg text-positive"
-                    : "bg-burgundy-dark text-negative"
+                    : "bg-negative-bg text-negative"
                 }`}
               >
                 <span aria-hidden>{rising ? "↗" : "↘"}&nbsp;&nbsp;</span>
@@ -130,8 +128,8 @@ export function PriceChart({
               onClick={() => setRange(option)}
               className={`w-[60px] rounded-toggle py-2 text-xs font-semibold transition-colors ${
                 option === range
-                  ? "bg-gold text-on-gold"
-                  : "text-muted hover:text-cream"
+                  ? "bg-crimson text-on-crimson"
+                  : "text-muted hover:text-ink"
               }`}
             >
               {option}
@@ -178,8 +176,8 @@ export function PriceChart({
             dataKey="close"
             type="linear"
             stroke="none"
-            fill={areaColor}
-            fillOpacity={1}
+            fill={lineColor}
+            fillOpacity={0.12}
             baseValue="dataMin"
             isAnimationActive={!reducedMotion}
           />

@@ -3,7 +3,7 @@ import type { Suit } from "@/lib/tickers";
 
 /**
  * A playing-card suit from the design (files in public/suits/). Spades and clubs are
- * gold, hearts and diamonds pink. Purely decorative, so screen readers skip it.
+ * lavender, hearts and diamonds pink. Purely decorative, so screen readers skip it.
  *
  * This is a React component: a function that receives "props" (its parameters, here
  * `suit` and `size`) and returns markup.

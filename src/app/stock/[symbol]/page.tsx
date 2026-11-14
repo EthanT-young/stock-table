@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
+import { DecoPanel } from "@/components/deco-panel";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import {
@@ -61,7 +62,7 @@ export default async function StockPage({
       <SiteHeader />
       <main className="mx-auto w-full max-w-[1440px] px-5 pb-12 md:px-16">
         <div className="mt-5 flex items-center justify-between md:mt-8">
-          <Link href="/" className="text-sm font-medium text-gold">
+          <Link href="/" className="text-sm font-medium text-crimson">
             ←&nbsp;&nbsp;All companies
           </Link>
           <p className="hidden text-small text-muted md:block">
@@ -97,7 +98,7 @@ export default async function StockPage({
           </div>
         </div>
 
-        <section className="mt-8 rounded-xl bg-burgundy p-5 text-cream">
+        <DecoPanel tone="note" className="mt-8 p-5 text-ink md:p-6">
           <h2 className="text-lg font-semibold">
             A focused window, not a live feed.
           </h2>
@@ -105,7 +106,7 @@ export default async function StockPage({
             Prices are the latest 100 trading days from AlphaVantage. 1M, 3M and
             100D filter this same data in your browser. Not financial advice.
           </p>
-        </section>
+        </DecoPanel>
       </main>
       <SiteFooter />
     </>
