@@ -6,16 +6,16 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import {
   CompanyIdentity,
-  CompanyIdentitySkeleton,
+  CompanyIdentityPlaceholder,
 } from "@/components/stock/company-identity";
 import {
   CompanyOverview,
-  CompanyOverviewSkeleton,
+  CompanyOverviewPlaceholder,
 } from "@/components/stock/company-overview";
 import { PricePerformance } from "@/components/stock/price-performance";
 import {
   PriceHistory,
-  PriceHistorySkeleton,
+  PriceHistoryPlaceholder,
 } from "@/components/stock/price-history";
 import { RouletteLoader } from "@/components/stock/roulette-loader";
 import { findTicker } from "@/lib/tickers";
@@ -70,7 +70,7 @@ export default async function StockPage({
         </div>
 
         <div className="mt-6 md:mt-9">
-          <Suspense fallback={<CompanyIdentitySkeleton />}>
+          <Suspense fallback={<CompanyIdentityPlaceholder />}>
             <CompanyIdentity symbol={ticker.symbol} />
           </Suspense>
         </div>
@@ -85,13 +85,13 @@ export default async function StockPage({
           </div>
 
           <div className="order-3 lg:order-2">
-            <Suspense fallback={<CompanyOverviewSkeleton />}>
+            <Suspense fallback={<CompanyOverviewPlaceholder />}>
               <CompanyOverview symbol={ticker.symbol} />
             </Suspense>
           </div>
 
           <div className="order-2 lg:order-3 lg:col-span-2">
-            <Suspense fallback={<PriceHistorySkeleton />}>
+            <Suspense fallback={<PriceHistoryPlaceholder />}>
               <PriceHistory symbol={ticker.symbol} />
             </Suspense>
           </div>

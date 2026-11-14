@@ -1,5 +1,6 @@
 import { loadPrices } from "@/app/stock/[symbol]/data";
-import { Skeleton } from "@/components/skeleton";
+import { FaceDownCard } from "@/components/card-back";
+import { FlipReveal } from "@/components/flip-reveal";
 import {
   NOT_AVAILABLE,
   formatDate,
@@ -19,30 +20,24 @@ function changeColor(changePercent: number | null): string {
   return "text-muted";
 }
 
-/** The panel frame and heading, shared by the table and its loading placeholder. */
-function HistoryPanel({
-  className = "",
-  children,
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
+/** The panel frame and heading, turned over like a card when it appears. */
+function HistoryPanel({ children }: { children: React.ReactNode }) {
   return (
-    <section
-      className={`overflow-hidden rounded-md border border-border bg-surface ${className}`}
-    >
-      <div className="flex flex-wrap items-start justify-between gap-3 p-5 md:p-6">
-        <div>
-          <h2 className="font-display text-[24px] text-crimson md:text-h3">
-            Daily history
-          </h2>
-          <p className="mt-1 text-xs text-muted">
-            100 trading days · Newest first
-          </p>
+    <FlipReveal delayMs={240}>
+      <section className="overflow-hidden rounded-md border border-border bg-surface">
+        <div className="flex flex-wrap items-start justify-between gap-3 p-5 md:p-6">
+          <div>
+            <h2 className="font-display text-[24px] text-crimson md:text-h3">
+              Daily history
+            </h2>
+            <p className="mt-1 text-xs text-muted">
+              100 trading days · Newest first
+            </p>
+          </div>
         </div>
-      </div>
-      {children}
-    </section>
+        {children}
+      </section>
+    </FlipReveal>
   );
 }
 
@@ -55,7 +50,7 @@ export async function PriceHistory({ symbol }: { symbol: string }) {
   const prices = await loadPrices(symbol);
   if (!prices) {
     return (
-      <HistoryPanel className="blur-fade-in">
+      <HistoryPanel>
         <p className="px-6 pb-6 text-body text-muted">
           Price history isn&rsquo;t available right now. Please try again later.
         </p>
@@ -65,7 +60,7 @@ export async function PriceHistory({ symbol }: { symbol: string }) {
   const rows = withDailyChange(prices);
 
   return (
-    <HistoryPanel className="blur-fade-in">
+    <HistoryPanel>
       {/* tabIndex lets keyboard users focus the box and scroll it with the arrow keys. */}
       <div
         tabIndex={0}
@@ -130,14 +125,11 @@ export async function PriceHistory({ symbol }: { symbol: string }) {
   );
 }
 
-export function PriceHistorySkeleton() {
+export function PriceHistoryPlaceholder() {
   return (
-    <HistoryPanel>
-      <div className="fade-in-late space-y-4 px-5 pb-6 md:px-6">
-        {[0, 1, 2, 3, 4, 5].map((row) => (
-          <Skeleton key={row} className="h-4 w-full" />
-        ))}
-      </div>
-    </HistoryPanel>
+    <FaceDownCard
+      label="Loading the price history"
+      className="h-[410px] md:h-[480px]"
+    />
   );
 }

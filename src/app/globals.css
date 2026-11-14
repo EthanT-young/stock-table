@@ -63,10 +63,6 @@
   --color-roulette-red: #981b32;
   --color-roulette-black: #292328;
 
-  /* Loading placeholders */
-  --color-skeleton-panel: #f5f0e9;
-  --color-skeleton: #ddd2c3;
-
   /* Fonts: the variables are set by next/font in layout.tsx */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-playfair), ui-serif, Georgia, serif;
@@ -99,6 +95,22 @@
   background-image: linear-gradient(90deg, #a5213a, #80152b);
 }
 
+/* The back of a playing card: crimson with a fine gold lattice (loading placeholders). */
+@utility bg-card-back {
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      rgb(219 196 155 / 0.14) 0 1px,
+      transparent 1px 14px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgb(219 196 155 / 0.14) 0 1px,
+      transparent 1px 14px
+    ),
+    linear-gradient(90deg, #a5213a, #80152b);
+}
+
 @utility bg-ivory-gradient {
   background-image: linear-gradient(90deg, #fffcf7, #f4ebdd);
 }
@@ -109,27 +121,56 @@ body {
 }
 
 /*
- * Loading placeholders: a soft highlight sweeps across each grey bar ("shimmer").
- * People who ask their system for reduced motion get still bars instead.
+ * Card flip: while a section loads, it shows a face-down card (see card-back.tsx) that
+ * gently "breathes". When the data arrives, the section mounts inside a two-sided card
+ * that starts showing its back and turns over to reveal the section (see flip-reveal.tsx).
+ * CSS only, so it plays as soon as the section arrives.
  */
-@keyframes shimmer {
-  from {
-    background-position: 200% 0;
+@keyframes card-breathe {
+  0%,
+  100% {
+    transform: scale(1);
   }
-  to {
-    background-position: -200% 0;
+  50% {
+    transform: scale(1.01);
   }
 }
 
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--color-skeleton) 25%,
-    color-mix(in srgb, var(--color-skeleton), white 45%) 50%,
-    var(--color-skeleton) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.6s ease-in-out infinite;
+.card-breathe {
+  animation: card-breathe 1.8s ease-in-out infinite;
+}
+
+@keyframes card-flip-in {
+  from {
+    transform: rotateY(-180deg);
+  }
+  to {
+    transform: rotateY(0deg);
+  }
+}
+
+/* A distant viewpoint keeps wide panels from distorting as they turn. */
+.flip-scene {
+  perspective: 3200px;
+}
+
+/* "backwards" applies the start of the flip before it plays, and removes the transform
+   once it ends, so the finished section is a normal flat element again. */
+.flip-card {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: card-flip-in 0.75s cubic-bezier(0.3, 0.7, 0.2, 1) backwards;
+}
+
+.flip-front,
+.flip-back {
+  backface-visibility: hidden;
+}
+
+.flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
 }
 
 /*
@@ -169,9 +210,13 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton,
+  .card-breathe,
+  .flip-card,
   .blur-fade-in {
     animation: none;
+  }
+  .flip-back {
+    display: none;
   }
   .fade-in-late {
     animation: none;

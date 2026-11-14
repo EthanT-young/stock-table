@@ -1,6 +1,7 @@
 import { loadPrices, loadProfile } from "@/app/stock/[symbol]/data";
 import { CornerBrackets } from "@/components/corner-brackets";
-import { Skeleton } from "@/components/skeleton";
+import { FaceDownCard } from "@/components/card-back";
+import { FlipReveal } from "@/components/flip-reveal";
 import { MarketCapValue } from "@/components/stock/market-cap-value";
 import { NOT_AVAILABLE, toSentenceCase } from "@/lib/format";
 
@@ -30,52 +31,49 @@ export async function CompanyOverview({ symbol }: { symbol: string }) {
   const latestClose = prices?.[0]?.close ?? null;
 
   return (
-    <section className="blur-fade-in relative flex h-full flex-col rounded-md border border-border bg-ivory-gradient p-5 md:p-6">
-      <CornerBrackets size={10} inset={7} opacity={0.42} />
-      <h2 className="font-display text-h4 text-crimson">Behind the ticker</h2>
+    <FlipReveal delayMs={120} className="h-full">
+      <section className="relative flex h-full flex-col rounded-md border border-border bg-ivory-gradient p-5 md:p-6">
+        <CornerBrackets size={10} inset={7} opacity={0.42} />
+        <h2 className="font-display text-h4 text-crimson">Behind the ticker</h2>
 
-      <dl className="mt-5 space-y-4">
-        <Field label="DESCRIPTION">
-          {profile.description ? (
-            <span className="font-normal">{profile.description}</span>
-          ) : (
-            NOT_AVAILABLE
-          )}
-        </Field>
-        <Field label="SECTOR">
-          {profile.sector ? toSentenceCase(profile.sector) : NOT_AVAILABLE}
-        </Field>
-        <Field label="INDUSTRY">
-          {profile.industry ? toSentenceCase(profile.industry) : NOT_AVAILABLE}
-        </Field>
-        <Field label="MARKET CAP">
-          {profile.marketCap ? (
-            <MarketCapValue
-              marketCap={profile.marketCap}
-              latestClose={latestClose}
-              id={`${symbol}-market-cap`}
-            />
-          ) : (
-            NOT_AVAILABLE
-          )}
-        </Field>
-      </dl>
-    </section>
+        <dl className="mt-5 space-y-4">
+          <Field label="DESCRIPTION">
+            {profile.description ? (
+              <span className="font-normal">{profile.description}</span>
+            ) : (
+              NOT_AVAILABLE
+            )}
+          </Field>
+          <Field label="SECTOR">
+            {profile.sector ? toSentenceCase(profile.sector) : NOT_AVAILABLE}
+          </Field>
+          <Field label="INDUSTRY">
+            {profile.industry
+              ? toSentenceCase(profile.industry)
+              : NOT_AVAILABLE}
+          </Field>
+          <Field label="MARKET CAP">
+            {profile.marketCap ? (
+              <MarketCapValue
+                marketCap={profile.marketCap}
+                latestClose={latestClose}
+                id={`${symbol}-market-cap`}
+              />
+            ) : (
+              NOT_AVAILABLE
+            )}
+          </Field>
+        </dl>
+      </section>
+    </FlipReveal>
   );
 }
 
-export function CompanyOverviewSkeleton() {
+export function CompanyOverviewPlaceholder() {
   return (
-    <section className="fade-in-late relative h-full rounded-md border border-border bg-ivory-gradient p-5 md:p-6">
-      <Skeleton className="h-7 w-48" />
-      <div className="mt-6 space-y-5">
-        {["w-3/4", "w-1/2", "w-2/3", "w-1/3"].map((width) => (
-          <div key={width}>
-            <Skeleton className="h-2.5 w-20" />
-            <Skeleton className={`mt-2 h-4 ${width}`} />
-          </div>
-        ))}
-      </div>
-    </section>
+    <FaceDownCard
+      label="Loading the company overview"
+      className="h-full min-h-[330px]"
+    />
   );
 }
