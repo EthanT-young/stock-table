@@ -123,3 +123,83 @@ body {
   outline: 2px solid var(--color-gold);
   outline-offset: -2px;
 }
+
+/*
+ * Roulette loading animation for the price chart (src/components/stock/roulette-loader.tsx).
+ * The wheel spins and slows to a stop with the company's pocket under the pointer
+ * (--land, set per company), the ball settles above it, then the pocket turns gold and the
+ * caption changes. Pure CSS, so it starts as soon as the HTML arrives.
+ */
+@keyframes roulette-wheel {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(var(--land));
+  }
+}
+
+@keyframes roulette-ball {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-2520deg); /* 7 turns the other way, ending at the top */
+  }
+}
+
+@keyframes roulette-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes roulette-disappear {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.roulette-wheel {
+  transform: rotate(var(--land));
+  animation: roulette-wheel 2.6s cubic-bezier(0.15, 0.75, 0.25, 1) both;
+}
+
+.roulette-ball {
+  animation: roulette-ball 2.6s cubic-bezier(0.15, 0.75, 0.25, 1) both;
+}
+
+/* The gold highlight on the company's pocket and the "Dealing…" caption: after landing. */
+.roulette-after-landing {
+  animation: roulette-appear 0.3s ease-out 2.6s both;
+}
+
+/* The "No more bets…" caption: until landing. */
+.roulette-before-landing {
+  animation: roulette-disappear 0.2s ease-out 2.6s both;
+}
+
+.roulette-reduced-motion {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roulette-wheel,
+  .roulette-ball,
+  .roulette-after-landing {
+    animation: none;
+  }
+  .roulette-before-landing,
+  .roulette-after-landing.roulette-caption {
+    display: none;
+  }
+  .roulette-reduced-motion {
+    display: inline;
+  }
+}

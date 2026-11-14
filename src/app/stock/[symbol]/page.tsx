@@ -4,7 +4,6 @@ import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { Skeleton } from "@/components/skeleton";
 import {
   CompanyIdentity,
   CompanyIdentitySkeleton,
@@ -13,10 +12,12 @@ import {
   CompanyOverview,
   CompanyOverviewSkeleton,
 } from "@/components/stock/company-overview";
+import { PricePerformance } from "@/components/stock/price-performance";
 import {
   PriceHistory,
   PriceHistorySkeleton,
 } from "@/components/stock/price-history";
+import { RouletteLoader } from "@/components/stock/roulette-loader";
 import { findTicker } from "@/lib/tickers";
 
 // Render on every request: prices change daily and our own cache (src/lib/alphavantage)
@@ -77,13 +78,11 @@ export default async function StockPage({
         {/* Phones stack chart, history, overview; wide screens put the overview beside
             the chart and the history below both. `order-*` sets the visual order. */}
         <div className="mt-6 grid gap-6 md:mt-9 lg:grid-cols-[1fr_422px]">
-          <section className="order-1 min-h-[374px] rounded-xl border border-border bg-surface p-6 lg:min-h-[408px]">
-            <p className="text-label font-semibold text-muted">
-              PRICE PERFORMANCE
-            </p>
-            <Skeleton className="mt-6 h-10 w-40" />
-            <Skeleton className="mt-8 h-48 w-full" />
-          </section>
+          <div className="order-1">
+            <Suspense fallback={<RouletteLoader symbol={ticker.symbol} />}>
+              <PricePerformance symbol={ticker.symbol} />
+            </Suspense>
+          </div>
 
           <div className="order-3 lg:order-2">
             <Suspense fallback={<CompanyOverviewSkeleton />}>
