@@ -1,7 +1,696 @@
 {
-  "daily": {},
-  "listings": {},
-  "shares": {},
-  "sectors": null,
-  "overviewPremium": null
+  "daily": {
+    "AAPL": {
+      "fetchedAt": 1794626848724,
+      "value": [
+        {
+          "date": "2026-11-13",
+          "close": 356.27,
+          "volume": 39029552
+        },
+        {
+          "date": "2026-11-12",
+          "close": 354.88,
+          "volume": 31874978
+        },
+        {
+          "date": "2026-11-11",
+          "close": 355.63,
+          "volume": 34453477
+        },
+        {
+          "date": "2026-11-10",
+          "close": 348.51,
+          "volume": 29756060
+        },
+        {
+          "date": "2026-11-09",
+          "close": 350.69,
+          "volume": 48753052
+        },
+        {
+          "date": "2026-11-06",
+          "close": 342.37,
+          "volume": 44703806
+        },
+        {
+          "date": "2026-11-05",
+          "close": 344.17,
+          "volume": 75678945
+        },
+        {
+          "date": "2026-11-04",
+          "close": 349.51,
+          "volume": 89637749
+        },
+        {
+          "date": "2026-11-03",
+          "close": 331.9,
+          "volume": 63160026
+        },
+        {
+          "date": "2026-11-02",
+          "close": 338.32,
+          "volume": 64757691
+        },
+        {
+          "date": "2026-10-30",
+          "close": 344.63,
+          "volume": 67841555
+        },
+        {
+          "date": "2026-10-29",
+          "close": 348.91,
+          "volume": 42582126
+        },
+        {
+          "date": "2026-10-28",
+          "close": 343.83,
+          "volume": 35714331
+        },
+        {
+          "date": "2026-10-27",
+          "close": 347.1,
+          "volume": 39984395
+        },
+        {
+          "date": "2026-10-26",
+          "close": 343.91,
+          "volume": 42743575
+        },
+        {
+          "date": "2026-10-23",
+          "close": 347.725,
+          "volume": 39539690
+        },
+        {
+          "date": "2026-10-22",
+          "close": 348.22,
+          "volume": 46898875
+        },
+        {
+          "date": "2026-10-21",
+          "close": 343.99,
+          "volume": 35614126
+        },
+        {
+          "date": "2026-10-20",
+          "close": 339.5,
+          "volume": 35851382
+        },
+        {
+          "date": "2026-10-19",
+          "close": 342.94,
+          "volume": 34573181
+        },
+        {
+          "date": "2026-10-16",
+          "close": 343.46,
+          "volume": 59946368
+        },
+        {
+          "date": "2026-10-15",
+          "close": 342,
+          "volume": 39767256
+        },
+        {
+          "date": "2026-10-14",
+          "close": 342.96,
+          "volume": 50061053
+        },
+        {
+          "date": "2026-10-13",
+          "close": 341.27,
+          "volume": 38983839
+        },
+        {
+          "date": "2026-10-12",
+          "close": 340.97,
+          "volume": 25900599
+        },
+        {
+          "date": "2026-10-09",
+          "close": 336.64,
+          "volume": 37881199
+        },
+        {
+          "date": "2026-10-08",
+          "close": 340.42,
+          "volume": 35332449
+        },
+        {
+          "date": "2026-10-07",
+          "close": 336.67,
+          "volume": 34147860
+        },
+        {
+          "date": "2026-10-06",
+          "close": 333.63,
+          "volume": 30449005
+        },
+        {
+          "date": "2026-10-05",
+          "close": 332.89,
+          "volume": 34400850
+        },
+        {
+          "date": "2026-10-02",
+          "close": 333.69,
+          "volume": 33278552
+        },
+        {
+          "date": "2026-10-01",
+          "close": 330.32,
+          "volume": 36306346
+        },
+        {
+          "date": "2026-09-30",
+          "close": 333.02,
+          "volume": 49988558
+        },
+        {
+          "date": "2026-09-29",
+          "close": 329.4,
+          "volume": 38478037
+        },
+        {
+          "date": "2026-09-28",
+          "close": 338.4,
+          "volume": 32820848
+        },
+        {
+          "date": "2026-09-25",
+          "close": 341.07,
+          "volume": 30002507
+        },
+        {
+          "date": "2026-09-24",
+          "close": 335.92,
+          "volume": 24733098
+        },
+        {
+          "date": "2026-09-23",
+          "close": 337.02,
+          "volume": 31658823
+        },
+        {
+          "date": "2026-09-22",
+          "close": 339.75,
+          "volume": 40711786
+        },
+        {
+          "date": "2026-09-21",
+          "close": 338.98,
+          "volume": 34999229
+        },
+        {
+          "date": "2026-09-18",
+          "close": 336.13,
+          "volume": 86588203
+        },
+        {
+          "date": "2026-09-17",
+          "close": 337,
+          "volume": 36700225
+        },
+        {
+          "date": "2026-09-16",
+          "close": 332.41,
+          "volume": 35981000
+        },
+        {
+          "date": "2026-09-15",
+          "close": 331.34,
+          "volume": 31748183
+        },
+        {
+          "date": "2026-09-14",
+          "close": 333.08,
+          "volume": 39269147
+        },
+        {
+          "date": "2026-09-11",
+          "close": 332.27,
+          "volume": 50716865
+        },
+        {
+          "date": "2026-09-10",
+          "close": 326.57,
+          "volume": 70011913
+        },
+        {
+          "date": "2026-09-09",
+          "close": 315.34,
+          "volume": 65639962
+        },
+        {
+          "date": "2026-09-08",
+          "close": 316.22,
+          "volume": 35477090
+        },
+        {
+          "date": "2026-09-04",
+          "close": 319.97,
+          "volume": 39606884
+        },
+        {
+          "date": "2026-09-03",
+          "close": 328.21,
+          "volume": 37225838
+        },
+        {
+          "date": "2026-09-02",
+          "close": 324.96,
+          "volume": 33776370
+        },
+        {
+          "date": "2026-09-01",
+          "close": 325.13,
+          "volume": 53167388
+        },
+        {
+          "date": "2026-08-31",
+          "close": 316.85,
+          "volume": 41242724
+        },
+        {
+          "date": "2026-08-28",
+          "close": 319.7,
+          "volume": 38649398
+        },
+        {
+          "date": "2026-08-27",
+          "close": 314.58,
+          "volume": 32419233
+        },
+        {
+          "date": "2026-08-26",
+          "close": 313.45,
+          "volume": 34024486
+        },
+        {
+          "date": "2026-08-25",
+          "close": 309.9,
+          "volume": 25869807
+        },
+        {
+          "date": "2026-08-24",
+          "close": 310.34,
+          "volume": 34673582
+        },
+        {
+          "date": "2026-08-21",
+          "close": 309.35,
+          "volume": 46876815
+        },
+        {
+          "date": "2026-08-20",
+          "close": 311.3,
+          "volume": 40959184
+        },
+        {
+          "date": "2026-08-19",
+          "close": 316.83,
+          "volume": 50505646
+        },
+        {
+          "date": "2026-08-18",
+          "close": 310.03,
+          "volume": 53424535
+        },
+        {
+          "date": "2026-08-17",
+          "close": 305.59,
+          "volume": 38169263
+        },
+        {
+          "date": "2026-08-14",
+          "close": 305.93,
+          "volume": 28229375
+        },
+        {
+          "date": "2026-08-13",
+          "close": 305.26,
+          "volume": 40349289
+        },
+        {
+          "date": "2026-08-12",
+          "close": 302.25,
+          "volume": 41657768
+        },
+        {
+          "date": "2026-08-11",
+          "close": 304.91,
+          "volume": 37476746
+        },
+        {
+          "date": "2026-08-10",
+          "close": 308.26,
+          "volume": 44812503
+        },
+        {
+          "date": "2026-08-07",
+          "close": 313.33,
+          "volume": 34437191
+        },
+        {
+          "date": "2026-08-06",
+          "close": 312.41,
+          "volume": 46139901
+        },
+        {
+          "date": "2026-08-05",
+          "close": 311,
+          "volume": 49438763
+        },
+        {
+          "date": "2026-08-04",
+          "close": 309.38,
+          "volume": 68000969
+        },
+        {
+          "date": "2026-08-03",
+          "close": 303.42,
+          "volume": 75051951
+        },
+        {
+          "date": "2026-07-31",
+          "close": 308.91,
+          "volume": 132489137
+        },
+        {
+          "date": "2026-07-30",
+          "close": 333.43,
+          "volume": 74817792
+        },
+        {
+          "date": "2026-07-29",
+          "close": 338.19,
+          "volume": 56090840
+        },
+        {
+          "date": "2026-07-28",
+          "close": 340.08,
+          "volume": 51859042
+        },
+        {
+          "date": "2026-07-27",
+          "close": 336.91,
+          "volume": 49604297
+        },
+        {
+          "date": "2026-07-24",
+          "close": 333.02,
+          "volume": 47489415
+        },
+        {
+          "date": "2026-07-23",
+          "close": 321.66,
+          "volume": 40840778
+        },
+        {
+          "date": "2026-07-22",
+          "close": 325.89,
+          "volume": 38755929
+        },
+        {
+          "date": "2026-07-21",
+          "close": 327.74,
+          "volume": 41338917
+        },
+        {
+          "date": "2026-07-20",
+          "close": 326.59,
+          "volume": 53468008
+        },
+        {
+          "date": "2026-07-17",
+          "close": 333.74,
+          "volume": 63407059
+        },
+        {
+          "date": "2026-07-16",
+          "close": 333.26,
+          "volume": 62970617
+        },
+        {
+          "date": "2026-07-15",
+          "close": 327.5,
+          "volume": 60957644
+        },
+        {
+          "date": "2026-07-14",
+          "close": 314.86,
+          "volume": 36336829
+        },
+        {
+          "date": "2026-07-13",
+          "close": 317.31,
+          "volume": 43257804
+        },
+        {
+          "date": "2026-07-10",
+          "close": 315.32,
+          "volume": 34132321
+        },
+        {
+          "date": "2026-07-09",
+          "close": 316.22,
+          "volume": 48124490
+        },
+        {
+          "date": "2026-07-08",
+          "close": 313.39,
+          "volume": 41323480
+        },
+        {
+          "date": "2026-07-07",
+          "close": 310.66,
+          "volume": 42490002
+        },
+        {
+          "date": "2026-07-06",
+          "close": 312.66,
+          "volume": 53589977
+        },
+        {
+          "date": "2026-07-02",
+          "close": 308.63,
+          "volume": 75400626
+        },
+        {
+          "date": "2026-07-01",
+          "close": 294.38,
+          "volume": 50164232
+        },
+        {
+          "date": "2026-06-30",
+          "close": 289.36,
+          "volume": 65100155
+        },
+        {
+          "date": "2026-06-29",
+          "close": 281.74,
+          "volume": 66427002
+        },
+        {
+          "date": "2026-06-26",
+          "close": 283.78,
+          "volume": 261775450
+        },
+        {
+          "date": "2026-06-25",
+          "close": 275.15,
+          "volume": 107253659
+        }
+      ]
+    }
+  },
+  "listings": {
+    "AAPL": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "AAPL",
+        "name": "Apple Inc",
+        "exchange": "NASDAQ",
+        "assetType": "Stock"
+      }
+    },
+    "AMD": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "AMD",
+        "name": "Advanced Micro Devices Inc",
+        "exchange": "NASDAQ",
+        "assetType": "Stock"
+      }
+    },
+    "AMZN": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "AMZN",
+        "name": "Amazon.com Inc",
+        "exchange": "NASDAQ",
+        "assetType": "Stock"
+      }
+    },
+    "BA": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "BA",
+        "name": "Boeing Company",
+        "exchange": "NYSE",
+        "assetType": "Stock"
+      }
+    },
+    "DIS": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "DIS",
+        "name": "Walt Disney Co (The)",
+        "exchange": "NYSE",
+        "assetType": "Stock"
+      }
+    },
+    "GOOGL": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "GOOGL",
+        "name": "Alphabet Inc - Class A",
+        "exchange": "NASDAQ",
+        "assetType": "Stock"
+      }
+    },
+    "JNJ": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "JNJ",
+        "name": "Johnson & Johnson",
+        "exchange": "NYSE",
+        "assetType": "Stock"
+      }
+    },
+    "JPM": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "JPM",
+        "name": "JPMorgan Chase & Company",
+        "exchange": "NYSE",
+        "assetType": "Stock"
+      }
+    },
+    "KO": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "KO",
+        "name": "Coca-Cola Company",
+        "exchange": "NYSE",
+        "assetType": "Stock"
+      }
+    },
+    "META": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "META",
+        "name": "Meta Platforms Inc - Class A",
+        "exchange": "NASDAQ",
+        "assetType": "Stock"
+      }
+    },
+    "NFLX": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "NFLX",
+        "name": "Netflix Inc",
+        "exchange": "NASDAQ",
+        "assetType": "Stock"
+      }
+    },
+    "NVDA": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "NVDA",
+        "name": "NVIDIA Corp",
+        "exchange": "NASDAQ",
+        "assetType": "Stock"
+      }
+    },
+    "TSLA": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "TSLA",
+        "name": "Tesla Inc",
+        "exchange": "NASDAQ",
+        "assetType": "Stock"
+      }
+    },
+    "V": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "V",
+        "name": "Visa Inc - Class A",
+        "exchange": "NYSE",
+        "assetType": "Stock"
+      }
+    },
+    "WMT": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "WMT",
+        "name": "Walmart Inc",
+        "exchange": "NASDAQ",
+        "assetType": "Stock"
+      }
+    },
+    "XOM": {
+      "fetchedAt": 1794634302680,
+      "value": {
+        "symbol": "XOM",
+        "name": "Exxon Mobil Corp",
+        "exchange": "NYSE",
+        "assetType": "Stock"
+      }
+    }
+  },
+  "shares": {
+    "AAPL": {
+      "fetchedAt": 1794626202217,
+      "value": {
+        "date": "2026-09-30",
+        "shares": 14630318000
+      }
+    },
+    "TSLA": {
+      "fetchedAt": 1794627179479,
+      "value": {
+        "date": "2026-09-30",
+        "shares": 3541000000
+      }
+    },
+    "V": {
+      "fetchedAt": 1794626559253,
+      "value": {
+        "date": "2026-09-30",
+        "shares": 1882000000
+      }
+    }
+  },
+  "sectors": {
+    "fetchedAt": 1794626645474,
+    "value": {
+      "NVDA": "INFORMATION TECHNOLOGY",
+      "AAPL": "INFORMATION TECHNOLOGY",
+      "AMD": "INFORMATION TECHNOLOGY",
+      "META": "COMMUNICATION SERVICES",
+      "GOOGL": "COMMUNICATION SERVICES",
+      "DIS": "COMMUNICATION SERVICES",
+      "NFLX": "COMMUNICATION SERVICES",
+      "JPM": "FINANCIALS",
+      "V": "FINANCIALS"
+    }
+  },
+  "overviewPremium": {
+    "fetchedAt": 1794627179479,
+    "value": true
+  }
 }
