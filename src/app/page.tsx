@@ -2,8 +2,11 @@ import Image from "next/image";
 import { DecoPanel } from "@/components/deco-panel";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { StockCard } from "@/components/stock-card";
-import { NOT_AVAILABLE, toSentenceCase } from "@/lib/format";
+import {
+  StockDirectory,
+  type DirectoryItem,
+} from "@/components/directory/stock-directory";
+import { toSentenceCase } from "@/lib/format";
 import { snapshot } from "@/lib/snapshot";
 import { TICKERS } from "@/lib/tickers";
 
@@ -12,22 +15,32 @@ import { TICKERS } from "@/lib/tickers";
  *
  * It makes no API requests. Sectors come from the committed snapshot, the same source the
  * details pages use, so a card and its details page always agree. Next.js renders this
- * page once at build time and serves it as static HTML.
+ * page once at build time and serves it as static HTML; the search and sector filters
+ * then run in the browser (see StockDirectory).
+ *
+ * Phones and tablets get the crimson hero above the discovery bar; desktops show only the
+ * bar, as in the design.
  */
 export default function HomePage() {
-  const sectorOf = (symbol: string): string => {
-    const sector = snapshot.sector(symbol);
-    return sector ? toSentenceCase(sector) : NOT_AVAILABLE;
-  };
-  const sectorCount = new Set(
-    TICKERS.map((ticker) => snapshot.sector(ticker.symbol)).filter(Boolean),
-  ).size;
+  // Everything the browser-side directory needs, prepared here on the server.
+  const items: DirectoryItem[] = TICKERS.map((ticker) => {
+    const sector = snapshot.sector(ticker.symbol);
+    return {
+      ticker,
+      symbol: ticker.symbol,
+      displayName: ticker.displayName,
+      sector: sector ? toSentenceCase(sector) : null,
+    };
+  });
 
   return (
     <>
       <SiteHeader showTagline />
       <main className="mx-auto w-full max-w-[1440px] px-5 md:px-16">
-        <DecoPanel tone="crimson" className="mt-4 p-6 md:mt-6 md:p-10">
+        <DecoPanel
+          tone="crimson"
+          className="mt-4 p-6 md:mt-6 md:p-10 lg:hidden"
+        >
           <p className="text-xs font-medium tracking-[1.2px] text-ivory">
             CURATED. NOT COMPLICATED.
           </p>
@@ -59,35 +72,7 @@ export default function HomePage() {
           />
         </DecoPanel>
 
-        {/* scroll-mt keeps the heading visible when "Explore stocks" jumps here */}
-        <section id="collection" className="mt-7 scroll-mt-6 pb-12 md:mt-10">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="font-display text-[24px] text-crimson md:text-h2">
-              The company collection
-            </h2>
-            <p className="hidden text-small font-medium text-muted md:block">
-              {TICKERS.length} companies&nbsp;&nbsp;/&nbsp;&nbsp;{sectorCount}{" "}
-              sectors
-            </p>
-          </div>
-          <p className="mt-2 text-small text-muted md:text-body">
-            <span className="md:hidden">
-              16 familiar names, all in one place.
-            </span>
-            <span className="hidden md:inline">
-              From everyday essentials to what&rsquo;s next. Pick a company to
-              look closer.
-            </span>
-          </p>
-
-          <ul className="mt-6 grid gap-2.5 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
-            {TICKERS.map((ticker) => (
-              <li key={ticker.symbol}>
-                <StockCard ticker={ticker} sector={sectorOf(ticker.symbol)} />
-              </li>
-            ))}
-          </ul>
-        </section>
+        <StockDirectory items={items} />
       </main>
       <SiteFooter note="Fixed collection · No live data on this page" />
     </>
