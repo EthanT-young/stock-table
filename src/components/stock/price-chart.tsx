@@ -77,6 +77,12 @@ export function PriceChart({
   const chartData = [...inRange].reverse(); // charts draw left to right, oldest first
   const latest = prices[0];
   const rising = change !== null && change >= 0;
+  // The chart takes the colour of the selected range: green if the price went up over
+  // it, red if it went down. (Written out in full so Tailwind keeps both colour tokens.)
+  const lineColor = rising ? "var(--color-positive)" : "var(--color-negative)";
+  const areaColor = rising
+    ? "var(--color-raised)"
+    : "var(--color-burgundy-dark)";
 
   return (
     <section className="flex min-h-[374px] flex-col rounded-xl border border-border bg-surface p-5 md:p-6 lg:min-h-[408px]">
@@ -166,13 +172,13 @@ export function PriceChart({
           />
           <Tooltip
             content={ChartTooltip}
-            cursor={{ stroke: "var(--color-gold)", strokeOpacity: 0.4 }}
+            cursor={{ stroke: lineColor, strokeOpacity: 0.4 }}
           />
           <Area
             dataKey="close"
             type="linear"
             stroke="none"
-            fill="var(--color-raised)"
+            fill={areaColor}
             fillOpacity={1}
             baseValue="dataMin"
             isAnimationActive={!reducedMotion}
@@ -180,12 +186,12 @@ export function PriceChart({
           <Line
             dataKey="close"
             type="linear"
-            stroke="var(--color-gold)"
+            stroke={lineColor}
             strokeWidth={2.5}
             dot={false}
             activeDot={{
               r: 4,
-              fill: "var(--color-gold)",
+              fill: lineColor,
               stroke: "var(--color-surface)",
             }}
             isAnimationActive={!reducedMotion}
