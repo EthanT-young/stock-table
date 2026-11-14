@@ -77,6 +77,21 @@ describe("RateLimiter", () => {
     expect(await limiter.acquire(NO_WAIT)).toBe(true);
   });
 
+  it("cancels a waiting caller if a pause starts while it waits", async () => {
+    const clock = fakeClock();
+    // While the second caller sleeps, another request gets refused and pauses us.
+    const limiter: RateLimiter = new RateLimiter(
+      LIMITS,
+      clock.now,
+      async (ms) => {
+        clock.advance(ms);
+        limiter.pauseFor(60_000);
+      },
+    );
+    expect(await limiter.acquire(NO_WAIT)).toBe(true);
+    expect(await limiter.acquire(3000)).toBe(false);
+  });
+
   it("never gives two waiting callers the same slot", async () => {
     const clock = fakeClock();
     const startTimes: number[] = [];

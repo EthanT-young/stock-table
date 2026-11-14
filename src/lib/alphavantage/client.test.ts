@@ -101,6 +101,18 @@ describe("fetchAlphaVantage", () => {
     expect(pause).not.toHaveBeenCalled();
   });
 
+  it("pauses all calls when AlphaVantage can't be reached", async () => {
+    const { deps: d, limiter } = deps("{}");
+    d.fetch = (async () => {
+      throw new Error("timeout");
+    }) as typeof fetch;
+    const pause = vi.spyOn(limiter, "pauseFor");
+    await expect(fetchAlphaVantage({ function: "X" }, 0, d)).rejects.toThrow(
+      /could not be reached/,
+    );
+    expect(pause).toHaveBeenCalledWith(60_000);
+  });
+
   it("throws on a non-200 HTTP status", async () => {
     const { deps: d } = deps("oops");
     d.fetch = (async () =>

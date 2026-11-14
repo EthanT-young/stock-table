@@ -104,6 +104,13 @@ export class RateLimiter {
     this.grantedAt.push(startAt);
     if (waitMs > 0) {
       await this.sleep(waitMs);
+      // While we waited, AlphaVantage may have refused another request and paused us
+      // (pauseFor). Give the slot back instead of sending a request that would also be
+      // refused.
+      if (this.now() < this.pausedUntil) {
+        this.grantedAt.splice(this.grantedAt.indexOf(startAt), 1);
+        return false;
+      }
     }
     return true;
   }

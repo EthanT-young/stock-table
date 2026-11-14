@@ -6,8 +6,9 @@
  *      on stored data only.
  *   2. The rate limiter must grant a slot within `maxWaitMs`, so a page never hangs
  *      waiting for the quota.
- *   3. If AlphaVantage answers with a rate-limit message anyway, all calls pause for a
- *      minute so we stop sending requests that will be refused.
+ *   3. If AlphaVantage answers with a rate-limit message anyway, or can't be reached
+ *      within 5 seconds, all calls pause for a minute, so we stop sending requests that
+ *      will fail and pages fall back to stored data straight away.
  *
  * It returns the raw response text; the parse functions turn it into data and throw on
  * error bodies.
@@ -18,8 +19,9 @@ import { AlphaVantageError, findProblem } from "@/lib/alphavantage/parse";
 import { RateLimiter } from "@/lib/alphavantage/rate-limiter";
 
 const BASE_URL = "https://www.alphavantage.co/query";
-const REQUEST_TIMEOUT_MS = 10_000;
-const PAUSE_AFTER_RATE_LIMIT_MS = 60_000;
+const REQUEST_TIMEOUT_MS = 5_000;
+/** How long all calls pause after AlphaVantage refuses a request or can't be reached. */
+const PAUSE_AFTER_FAILURE_MS = 60_000;
 /** How long a page waits for a rate-limit slot before using stored data instead. */
 export const PAGE_MAX_WAIT_MS = 3_000;
 
@@ -96,10 +98,22 @@ export async function fetchAlphaVantage(
   }
   url.searchParams.set("apikey", deps.env.ALPHAVANTAGE_API_KEY ?? "");
 
-  const response = await deps.fetch(url, {
-    cache: "no-store", // never let Next.js or the platform cache raw responses
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-  });
+  let response: Response;
+  try {
+    response = await deps.fetch(url, {
+      cache: "no-store", // never let Next.js or the platform cache raw responses
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+  } catch (error) {
+    // Timeout or network failure: AlphaVantage is unreachable. Pause so the page's other
+    // requests (and other visitors') use stored data at once instead of each waiting
+    // for its own timeout.
+    deps.limiter.pauseFor(PAUSE_AFTER_FAILURE_MS);
+    throw new AlphaVantageError({
+      kind: "error",
+      message: `AlphaVantage could not be reached: ${String(error)}`,
+    });
+  }
   if (!response.ok) {
     throw new AlphaVantageError({
       kind: "error",
@@ -111,7 +125,7 @@ export async function fetchAlphaVantage(
   if (text.trimStart().startsWith("{")) {
     const problem = findProblem(JSON.parse(text));
     if (problem?.kind === "rate-limit") {
-      deps.limiter.pauseFor(PAUSE_AFTER_RATE_LIMIT_MS);
+      deps.limiter.pauseFor(PAUSE_AFTER_FAILURE_MS);
     }
   }
   return text;
