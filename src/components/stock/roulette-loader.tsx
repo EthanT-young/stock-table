@@ -7,7 +7,7 @@ const POCKET_RADIUS = RADIUS - 6; // leaves a gold rim
 const POCKET_DEG = 360 / TICKERS.length;
 const FULL_TURNS = 5;
 
-/** How long the spin takes. Must match the 2.6s in the roulette animations in globals.css. */
+/** How long a landing spin takes. Must match the 2.6s in the roulette animations in globals.css. */
 export const ROULETTE_SPIN_MS = 2600;
 
 /** A point on the wheel at `angleDeg` (0 = top, clockwise) and distance `r` from the centre. */
@@ -44,30 +44,39 @@ function PocketLabel({ index, color }: { index: number; color: string }) {
 }
 
 /**
- * The roulette wheel with one pocket per company. It spins, slows down and stops with
- * `symbol`'s pocket under the pointer, which then turns gold, and the caption changes to
- * "Dealing AAPL…". The animation itself is CSS (see globals.css), so it starts as soon as
- * the wheel appears, with no JavaScript needed. Decorative: screen readers skip it.
+ * The roulette wheel with one pocket per company. The animation itself is CSS (see
+ * globals.css), so it starts as soon as the wheel appears, with no JavaScript needed.
+ * Decorative: screen readers skip it.
  *
- * Used by the chart's loading state and by the "Spin for a company" overlay.
+ * Two ways to use it:
+ *   - With `landOn` (the "Spin for a company" overlay): it spins, slows down and stops
+ *     with that company's pocket under the pointer, which then turns gold, and the
+ *     caption changes to "Dealing AAPL…".
+ *   - Without `landOn` (the chart's loading state): it keeps spinning at a steady speed
+ *     for as long as it is on screen. The page can't know in advance how long the data
+ *     will take, so a wheel that stopped early would look finished while still loading.
  */
 export function RouletteWheel({
-  symbol,
+  landOn,
   reducedMotionCaption,
 }: {
-  symbol: string;
-  /** Caption for visitors who switched off animations (the wheel is shown already landed). */
+  /** Symbol of the company to land on. Leave out to keep spinning. */
+  landOn?: string;
+  /** Caption for visitors who switched off animations (the wheel is shown standing still). */
   reducedMotionCaption: string;
 }) {
   const index = Math.max(
     0,
-    TICKERS.findIndex((ticker) => ticker.symbol === symbol),
+    TICKERS.findIndex((ticker) => ticker.symbol === landOn),
   );
   // Final wheel rotation: some full turns, ending with this pocket's centre at the top.
   const landingDeg = FULL_TURNS * 360 + (360 - (index + 0.5) * POCKET_DEG);
 
   return (
-    <div aria-hidden className="flex flex-col items-center">
+    <div
+      aria-hidden
+      className={`flex flex-col items-center ${landOn ? "" : "roulette-looping"}`}
+    >
       <div className="relative" style={{ width: SIZE, height: SIZE }}>
         {/* Pointer */}
         <div className="absolute -top-1.5 left-1/2 z-10 -translate-x-1/2 border-x-8 border-t-[14px] border-x-transparent border-t-gold-rim" />
@@ -100,14 +109,16 @@ export function RouletteWheel({
             </g>
           ))}
           {/* This company's pocket, turned gold once the wheel has landed. */}
-          <g className="roulette-after-landing">
-            <path
-              d={pocketPath(index)}
-              fill="var(--color-gold-light)"
-              stroke="var(--color-gold-rim)"
-            />
-            <PocketLabel index={index} color="var(--color-on-gold)" />
-          </g>
+          {landOn && (
+            <g className="roulette-after-landing">
+              <path
+                d={pocketPath(index)}
+                fill="var(--color-gold-light)"
+                stroke="var(--color-gold-rim)"
+              />
+              <PocketLabel index={index} color="var(--color-on-gold)" />
+            </g>
+          )}
           <circle
             cx={RADIUS}
             cy={RADIUS}
@@ -118,7 +129,7 @@ export function RouletteWheel({
           />
         </svg>
 
-        {/* Ball: circles the other way and settles at the top, above the pocket. */}
+        {/* Ball: circles the other way (and, when landing, settles above the pocket). */}
         <div className="roulette-ball absolute inset-0">
           <div className="absolute top-[5px] left-1/2 size-3 -translate-x-1/2 rounded-full bg-ivory shadow-[0_0_6px_var(--color-gold-rim)]" />
         </div>
@@ -137,9 +148,11 @@ export function RouletteWheel({
         <span className="roulette-before-landing col-start-1 row-start-1">
           Place your bets…
         </span>
-        <span className="roulette-after-landing roulette-caption col-start-1 row-start-1">
-          Dealing {symbol}…
-        </span>
+        {landOn && (
+          <span className="roulette-after-landing roulette-caption col-start-1 row-start-1">
+            Dealing {landOn}…
+          </span>
+        )}
         <span className="roulette-reduced-motion col-start-1 row-start-1">
           {reducedMotionCaption}
         </span>
@@ -149,8 +162,9 @@ export function RouletteWheel({
 }
 
 /**
- * The chart's loading state: the roulette, landing on this company. It only exists while
- * the chart's data is loading, and fades in after 0.3 s so fast loads never show it.
+ * The chart's loading state: the roulette, spinning until the chart's data is ready.
+ * React removes it as soon as the chart can be shown. It fades in after 0.3 s so fast
+ * loads never show it.
  */
 export function RouletteLoader({ symbol }: { symbol: string }) {
   return (
@@ -160,7 +174,7 @@ export function RouletteLoader({ symbol }: { symbol: string }) {
         Loading the price chart for {symbol}
       </p>
       <div className="fade-in-late flex flex-1 items-center justify-center py-4">
-        <RouletteWheel symbol={symbol} reducedMotionCaption="Loading…" />
+        <RouletteWheel reducedMotionCaption="Loading…" />
       </div>
     </section>
   );

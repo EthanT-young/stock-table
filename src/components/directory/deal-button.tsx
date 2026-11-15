@@ -117,7 +117,7 @@ export function DealButton() {
             {/* A new key restarts the CSS animation for every deal. */}
             <RouletteWheel
               key={deal.round}
-              symbol={deal.symbol}
+              landOn={deal.symbol}
               reducedMotionCaption={`Dealing ${deal.symbol}…`}
             />
           </div>

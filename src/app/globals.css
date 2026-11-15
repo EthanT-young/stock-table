@@ -235,10 +235,13 @@ body {
 }
 
 /*
- * Roulette loading animation for the price chart (src/components/stock/roulette-loader.tsx).
- * The wheel spins and slows to a stop with the company's pocket under the pointer
- * (--land, set per company), the ball settles above it, then the pocket turns gold and the
- * caption changes. Pure CSS, so it starts as soon as the HTML arrives.
+ * Roulette animations (src/components/stock/roulette-loader.tsx). Pure CSS, so they start
+ * as soon as the HTML arrives.
+ * Landing (the "Spin for a company" overlay): the wheel spins and slows to a stop with the
+ * company's pocket under the pointer (--land, set per company), the ball settles above
+ * it, then the pocket turns gold and the caption changes.
+ * Looping (the chart's loading state, inside .roulette-looping): wheel and ball keep
+ * turning at a steady speed until React replaces the loader with the chart.
  */
 @keyframes roulette-wheel {
   from {
@@ -255,6 +258,24 @@ body {
   }
   to {
     transform: rotate(-2520deg); /* 7 turns the other way, ending at the top */
+  }
+}
+
+@keyframes roulette-turn {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes roulette-turn-back {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
   }
 }
 
@@ -295,6 +316,20 @@ body {
   animation: roulette-disappear 0.2s ease-out 2.6s both;
 }
 
+.roulette-looping .roulette-wheel {
+  transform: none;
+  animation: roulette-turn 3s linear infinite;
+}
+
+.roulette-looping .roulette-ball {
+  animation: roulette-turn-back 2s linear infinite;
+}
+
+/* No landing, so the "Place your bets…" caption stays. */
+.roulette-looping .roulette-before-landing {
+  animation: none;
+}
+
 .roulette-reduced-motion {
   display: none;
 }
@@ -302,7 +337,9 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .roulette-wheel,
   .roulette-ball,
-  .roulette-after-landing {
+  .roulette-after-landing,
+  .roulette-looping .roulette-wheel,
+  .roulette-looping .roulette-ball {
     animation: none;
   }
   .roulette-before-landing,
