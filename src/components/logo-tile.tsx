@@ -33,6 +33,7 @@ export function LogoTile({
         <span
           className="font-display font-medium text-crimson"
           style={{ fontSize: size * 0.36 }}
+          role="img" // lets screen readers use the label below instead of reading the letters
           aria-label={`${name} logo`}
         >
           {symbol.slice(0, 2)}

@@ -128,9 +128,9 @@ export function PriceChart({
     <section className="blur-fade-in flex min-h-[374px] flex-col rounded-md border border-border bg-surface p-5 md:p-6 lg:min-h-[408px]">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-label font-semibold text-muted">
-            PRICE PERFORMANCE
-          </p>
+          <h2 className="text-label font-semibold text-muted uppercase">
+            Price performance
+          </h2>
           <div className="mt-3 flex flex-wrap items-center gap-4">
             <p className="text-[34px] leading-none font-semibold text-ink md:text-display">
               {formatUsd(latest.close)}

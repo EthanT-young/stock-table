@@ -15,7 +15,7 @@ function Field({
 }) {
   return (
     <div>
-      <dt className="text-micro font-semibold text-muted">{label}</dt>
+      <dt className="text-micro font-semibold text-muted uppercase">{label}</dt>
       <dd className="mt-1 text-body font-medium text-ink">{children}</dd>
     </div>
   );
@@ -37,22 +37,22 @@ export async function CompanyOverview({ symbol }: { symbol: string }) {
         <h2 className="font-display text-h4 text-crimson">Behind the ticker</h2>
 
         <dl className="mt-5 space-y-4">
-          <Field label="DESCRIPTION">
+          <Field label="Description">
             {profile.description ? (
               <span className="font-normal">{profile.description}</span>
             ) : (
               NOT_AVAILABLE
             )}
           </Field>
-          <Field label="SECTOR">
+          <Field label="Sector">
             {profile.sector ? toSentenceCase(profile.sector) : NOT_AVAILABLE}
           </Field>
-          <Field label="INDUSTRY">
+          <Field label="Industry">
             {profile.industry
               ? toSentenceCase(profile.industry)
               : NOT_AVAILABLE}
           </Field>
-          <Field label="MARKET CAP">
+          <Field label="Market cap">
             {profile.marketCap ? (
               <MarketCapValue
                 marketCap={profile.marketCap}

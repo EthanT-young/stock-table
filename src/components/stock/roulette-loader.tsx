@@ -52,15 +52,19 @@ function PocketLabel({ index, color }: { index: number; color: string }) {
  *   - With `landOn` (the "Spin for a company" overlay): it spins, slows down and stops
  *     with that company's pocket under the pointer, which then turns gold, and the
  *     caption changes to "Dealing AAPL…".
- *   - Without `landOn` (the chart's loading state): it keeps spinning at a steady speed
- *     for as long as it is on screen. The page can't know in advance how long the data
- *     will take, so a wheel that stopped early would look finished while still loading.
+ *   - Without `landOn` (the chart's loading state): it spins at a steady speed for about
+ *     5 seconds, then stops and the caption changes to "Still loading…", so a slow load
+ *     doesn't look finished. Moving content must stop within 5 seconds unless the page
+ *     offers a way to pause it (WCAG 2.2.2).
  */
 export function RouletteWheel({
   landOn,
   reducedMotionCaption,
 }: {
-  /** Symbol of the company to land on. Leave out to keep spinning. */
+  /**
+   * Symbol of the company to land on. Leave out for the chart's loading state (spins
+   * for about 5 s, then shows "Still loading…").
+   */
   landOn?: string;
   /** Caption for visitors who switched off animations (the wheel is shown standing still). */
   reducedMotionCaption: string;
@@ -148,9 +152,13 @@ export function RouletteWheel({
         <span className="roulette-before-landing col-start-1 row-start-1">
           Place your bets…
         </span>
-        {landOn && (
+        {landOn ? (
           <span className="roulette-after-landing roulette-caption col-start-1 row-start-1">
             Dealing {landOn}…
+          </span>
+        ) : (
+          <span className="roulette-still-loading col-start-1 row-start-1">
+            Still loading…
           </span>
         )}
         <span className="roulette-reduced-motion col-start-1 row-start-1">
@@ -162,14 +170,16 @@ export function RouletteWheel({
 }
 
 /**
- * The chart's loading state: the roulette, spinning until the chart's data is ready.
- * React removes it as soon as the chart can be shown. It fades in after 0.3 s so fast
- * loads never show it.
+ * The chart's loading state: the roulette, spinning for a few seconds while the chart's
+ * data loads. React removes it as soon as the chart can be shown. It fades in after
+ * 0.3 s so fast loads never show it.
  */
 export function RouletteLoader({ symbol }: { symbol: string }) {
   return (
     <section className="flex min-h-[374px] flex-col rounded-md border border-border bg-surface p-6 lg:min-h-[408px]">
-      <p className="text-label font-semibold text-muted">PRICE PERFORMANCE</p>
+      <h2 className="text-label font-semibold text-muted uppercase">
+        Price performance
+      </h2>
       <p role="status" className="sr-only">
         Loading the price chart for {symbol}
       </p>
