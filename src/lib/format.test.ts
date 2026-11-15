@@ -57,6 +57,18 @@ describe("formatMarketCap", () => {
 
   it("shows small values in full", () => {
     expect(formatMarketCap(12345)).toBe("$12,345");
+    expect(formatMarketCap(999_999)).toBe("$999,999");
+  });
+
+  it("moves to the next unit when rounding reaches it", () => {
+    expect(formatMarketCap(999_999_000_000)).toBe("$1.00T");
+    expect(formatMarketCap(999_995_000)).toBe("$1.00B");
+    expect(formatMarketCap(999_999.6)).toBe("$1.00M");
+  });
+
+  it("stays in the smaller unit when rounding does not reach the next", () => {
+    expect(formatMarketCap(999_994_000)).toBe("$999.99M");
+    expect(formatMarketCap(999_994_000_000)).toBe("$999.99B");
   });
 });
 

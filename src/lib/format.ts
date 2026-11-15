@@ -59,13 +59,19 @@ export function formatPercent(value: number): string {
 
 /** 5212343393860 -> "$5.21T", 801900000000 -> "$801.90B", 950000000 -> "$950.00M". */
 export function formatMarketCap(value: number): string {
-  const units: [number, string][] = [
-    [1e12, "T"],
-    [1e9, "B"],
-    [1e6, "M"],
+  // Each row: unit size, suffix, and the step the next smaller unit rounds to
+  // (hundredths of a billion, hundredths of a million, whole dollars).
+  const units: [number, string, number][] = [
+    [1e12, "T", 1e7],
+    [1e9, "B", 1e4],
+    [1e6, "M", 1],
   ];
-  for (const [size, suffix] of units) {
-    if (Math.abs(value) >= size) {
+  for (const [size, suffix, smallerUnitStep] of units) {
+    // Round the way the smaller unit would print the value before comparing. Otherwise
+    // 999,995,000 would print as "$1,000.00M" instead of "$1.00B".
+    const rounded =
+      Math.round(Math.abs(value) / smallerUnitStep) * smallerUnitStep;
+    if (rounded >= size) {
       return `$${twoDecimals.format(value / size)}${suffix}`;
     }
   }

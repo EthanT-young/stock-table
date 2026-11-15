@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Suspense } from "react";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -53,7 +53,9 @@ export default async function StockPage({
     notFound(); // shows not-found.tsx with HTTP status 404
   }
   if (symbol !== ticker.symbol) {
-    redirect(`/stock/${ticker.symbol}`); // e.g. /stock/aapl -> /stock/AAPL
+    // e.g. /stock/aapl -> /stock/AAPL. Permanent (HTTP 308): the lowercase address is
+    // just another spelling of the same page, so browsers and search engines can remember it.
+    permanentRedirect(`/stock/${ticker.symbol}`);
   }
 
   return (
