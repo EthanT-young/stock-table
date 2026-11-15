@@ -10,7 +10,9 @@ export async function PricePerformance({ symbol }: { symbol: string }) {
   if (!prices || prices.length === 0) {
     return (
       <section className="blur-fade-in flex min-h-[374px] flex-col rounded-md border border-border bg-surface p-6 lg:min-h-[408px]">
-        <p className="text-label font-semibold text-muted">PRICE PERFORMANCE</p>
+        <h2 className="text-label font-semibold text-muted uppercase">
+          Price performance
+        </h2>
         <p className="m-auto text-body text-muted">
           Price data isn&rsquo;t available right now. Please try again later.
         </p>
