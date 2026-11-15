@@ -6,22 +6,6 @@
 /** What the spec says to show when a value is not available. */
 export const NOT_AVAILABLE = "N/A";
 
-/**
- * Formats a value that might be missing: null or undefined become "N/A",
- * anything else goes through the given formatter.
- *
- * `<T>` is a generic type parameter, the same idea as `<T>` in Java.
- */
-export function orNotAvailable<T>(
-  value: T | null | undefined,
-  format: (present: T) => string,
-): string {
-  if (value === null || value === undefined) {
-    return NOT_AVAILABLE;
-  }
-  return format(value);
-}
-
 // Intl.NumberFormat is the built-in locale-aware formatter (like java.text.NumberFormat).
 // Creating them once and reusing them is cheaper than creating one per call.
 const twoDecimals = new Intl.NumberFormat("en-US", {

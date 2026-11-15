@@ -79,4 +79,11 @@ describe("filterEntries", () => {
   it("returns nothing when nothing matches", () => {
     expect(filterEntries(entries, "zzz", ALL_SECTORS)).toEqual([]);
   });
+
+  it("returns the caller's own type, extra fields included", () => {
+    const withSuits = entries.map((entry) => ({ ...entry, suit: "spade" }));
+    const [tesla] = filterEntries(withSuits, "tesla", ALL_SECTORS);
+    // Reading `.suit` only compiles because the result keeps the caller's type.
+    expect(tesla.suit).toBe("spade");
+  });
 });

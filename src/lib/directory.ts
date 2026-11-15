@@ -42,12 +42,16 @@ export function sectorOptions(
  * The search ignores case and surrounding spaces, and matches anywhere in the company
  * name or the ticker: "apple", "AAPL" and "pl" all find Apple. An empty search matches
  * everything.
+ *
+ * <T extends DirectoryEntry> works like a Java generic method: it accepts a list of any
+ * type that has at least the DirectoryEntry fields, and returns a list of that same type,
+ * so callers keep their extra fields without a cast.
  */
-export function filterEntries(
-  entries: readonly DirectoryEntry[],
+export function filterEntries<T extends DirectoryEntry>(
+  entries: readonly T[],
   query: string,
   sector: string,
-): DirectoryEntry[] {
+): T[] {
   const needle = query.trim().toLowerCase();
   return entries.filter((entry) => {
     const inSector = sector === ALL_SECTORS || entry.sector === sector;

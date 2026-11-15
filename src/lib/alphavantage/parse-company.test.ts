@@ -35,7 +35,6 @@ describe("parseOverview", () => {
       PERatio: "35.37",
     });
     expect(overview).toEqual({
-      symbol: "AAPL",
       assetType: "Common Stock",
       name: "Apple Inc",
       description:

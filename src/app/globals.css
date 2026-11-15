@@ -4,7 +4,7 @@
  * Design tokens from the Figma design ("Stock Table", white and royal red theme).
  *
  * Tailwind turns each token into utility classes: --color-crimson gives bg-crimson,
- * text-crimson, border-crimson...; --text-hero gives text-hero; --font-display gives
+ * text-crimson, border-crimson...; --text-display gives text-display; --font-display gives
  * font-display. Change a value here and every component using it follows.
  */
 @theme {
@@ -22,7 +22,9 @@
 
   /* Outlines */
   --color-border: rgb(217 204 184 / 0.38); /* card outlines */
-  --color-border-strong: rgb(197 166 110 / 0.85); /* hero and discovery bar */
+  --color-border-strong: rgb(
+    197 166 110 / 0.85
+  ); /* discovery bar and card backs */
   --color-input-border: rgb(212 196 176 / 0.7);
   --color-chip-border: rgb(215 189 160 / 0.7);
 
@@ -32,17 +34,15 @@
                              so it reads clearly on every beige background: WCAG AA) */
   --color-crimson: #981b32; /* royal red: brand, headings, names, selected buttons */
   --color-on-crimson: #ffffff;
-  --color-gold-ink: #806438; /* small gold labels: sector chip, API label, "404" */
+  --color-gold-ink: #806438; /* small gold text: sector chip, "est." button, "404" */
   --color-gold: #ba9c6c; /* thin gold lines: corner brackets */
   --color-gold-rim: #bca071; /* roulette rim and dividers */
   --color-gold-light: #f0e1be; /* the roulette's landed pocket */
   --color-on-gold: #392a19; /* text on gold */
   --color-logo-tile: #f5eedb; /* background behind company logos */
 
-  /* On the crimson hero and discovery bar */
+  /* On the crimson discovery bar */
   --color-ivory: #fff9f1;
-  --color-hero-heading: #f3ebdd;
-  --color-hero-italic: #e4cfab;
   --color-chip-bg: #85172b; /* sector filter chips */
   --color-chip-active-bg: #fff8ed;
 
@@ -68,13 +68,11 @@
   --font-display: var(--font-playfair), ui-serif, Georgia, serif;
 
   /* Type sizes from the design (12px and 14px use Tailwind's text-xs and text-sm) */
-  --text-hero: 54px;
   --text-display: 40px;
   --text-h2: 28px;
   --text-h3: 26px;
   --text-h4: 24px;
   --text-card: 21px;
-  --text-lead: 17px;
   --text-body: 15px;
   --text-small: 13px;
   --text-label: 11px;

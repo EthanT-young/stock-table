@@ -38,7 +38,6 @@ function numberOrNull(value: unknown): number | null {
 
 /** The OVERVIEW fields the details page uses. Any of them can be missing (null). */
 export interface Overview {
-  symbol: string | null;
   assetType: string | null;
   name: string | null;
   description: string | null;
@@ -63,7 +62,6 @@ export function parseOverview(body: unknown): Overview {
     });
   }
   return {
-    symbol: textOrNull(body["Symbol"]),
     assetType: textOrNull(body["AssetType"]),
     name: textOrNull(body["Name"]),
     description: textOrNull(body["Description"]),

@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  NOT_AVAILABLE,
   formatCompactVolume,
   formatDate,
   formatMarketCap,
@@ -9,21 +8,8 @@ import {
   formatShortDate,
   formatUsd,
   formatVolume,
-  orNotAvailable,
   toSentenceCase,
 } from "@/lib/format";
-
-describe("orNotAvailable", () => {
-  it("shows N/A for missing values", () => {
-    expect(orNotAvailable(null, formatPrice)).toBe(NOT_AVAILABLE);
-    expect(orNotAvailable(undefined, formatPrice)).toBe("N/A");
-  });
-
-  it("formats present values, including zero", () => {
-    expect(orNotAvailable(0, formatPrice)).toBe("0.00");
-    expect(orNotAvailable(237.49, formatUsd)).toBe("$237.49");
-  });
-});
 
 describe("prices and volume", () => {
   it("formats prices with two decimals and thousands separators", () => {

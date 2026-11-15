@@ -15,7 +15,7 @@ export function NotFoundPanel({
     <>
       <SiteHeader />
       <main className="mx-auto w-full max-w-[1440px] px-5 py-8 md:px-16 md:py-12">
-        <DecoPanel tone="ivory" className="max-w-[804px] p-6 md:p-9">
+        <DecoPanel className="max-w-[804px] p-6 md:p-9">
           <p className="font-sans text-[72px] leading-none font-bold text-gold-ink md:text-[94px]">
             404
           </p>

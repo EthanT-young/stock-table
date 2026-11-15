@@ -4,12 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { DealButton } from "@/components/directory/deal-button";
 import { StockCard } from "@/components/stock-card";
-import {
-  ALL_SECTORS,
-  filterEntries,
-  sectorOptions,
-  type DirectoryEntry,
-} from "@/lib/directory";
+import { ALL_SECTORS, filterEntries, sectorOptions } from "@/lib/directory";
 import { NOT_AVAILABLE } from "@/lib/format";
 import type { Ticker } from "@/lib/tickers";
 
@@ -26,9 +21,14 @@ function useShortcutLabel(): string {
   );
 }
 
-/** One company card's data: the ticker plus its displayed sector. */
-export interface DirectoryItem extends DirectoryEntry {
-  ticker: Ticker;
+/**
+ * One company card's data: the ticker (symbol, name, suit) plus its displayed sector.
+ * It also has every field filterEntries needs (symbol, displayName, sector), so it can be
+ * filtered directly.
+ */
+export interface DirectoryItem extends Ticker {
+  /** Sector label as displayed (e.g. "Information technology"), or null if unknown. */
+  sector: string | null;
 }
 
 /** A sector filter chip. `aria-pressed` tells screen readers whether it is selected. */
@@ -86,7 +86,7 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
   }, []);
 
   const sectors = sectorOptions(items);
-  const shown = filterEntries(items, query, sector) as DirectoryItem[];
+  const shown = filterEntries(items, query, sector);
   const filtered = query.trim() !== "" || sector !== ALL_SECTORS;
 
   function clearFilters() {
@@ -102,12 +102,13 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
       >
         <div className="flex flex-col gap-4 xl:grid xl:grid-cols-[1fr_minmax(0,566px)_292px] xl:items-start">
           <div>
-            <h2
+            {/* The homepage's main heading (h1); the collection below is an h2 under it. */}
+            <h1
               id="discovery-heading"
               className="font-display text-[24px] text-ivory md:text-[27px]"
             >
               Find your next company.
-            </h2>
+            </h1>
           </div>
 
           <div className="relative xl:mt-0.5">
@@ -187,7 +188,7 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
             {shown.map((item) => (
               <li key={item.symbol}>
                 <StockCard
-                  ticker={item.ticker}
+                  ticker={item}
                   sector={item.sector ?? NOT_AVAILABLE}
                 />
               </li>
