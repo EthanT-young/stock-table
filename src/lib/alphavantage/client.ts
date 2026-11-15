@@ -6,9 +6,10 @@
  *      on stored data only.
  *   2. The rate limiter must grant a slot within `maxWaitMs`, so a page never hangs
  *      waiting for the quota.
- *   3. If AlphaVantage answers with a rate-limit message anyway, or can't be reached
- *      within 5 seconds, all calls pause for a minute, so we stop sending requests that
- *      will fail and pages fall back to stored data straight away.
+ *   3. If AlphaVantage answers with a rate-limit message anyway, answers with a server
+ *      error (HTTP 5xx), or can't deliver its full response within 5 seconds, all calls
+ *      pause for a minute, so we stop sending requests that will fail and pages fall
+ *      back to stored data straight away.
  *
  * It returns the raw response text; the parse functions turn it into data and throw on
  * error bodies.
@@ -20,10 +21,10 @@ import { RateLimiter } from "@/lib/alphavantage/rate-limiter";
 
 const BASE_URL = "https://www.alphavantage.co/query";
 const REQUEST_TIMEOUT_MS = 5_000;
-/** How long all calls pause after AlphaVantage refuses a request or can't be reached. */
+/** How long all calls pause after AlphaVantage refuses a request, fails or can't be reached. */
 const PAUSE_AFTER_FAILURE_MS = 60_000;
 /** How long a page waits for a rate-limit slot before using stored data instead. */
-export const PAGE_MAX_WAIT_MS = 3_000;
+const PAGE_MAX_WAIT_MS = 3_000;
 
 /** Environment variables as plain name/value pairs (process.env fits this shape). */
 export type Env = Record<string, string | undefined>;
@@ -99,11 +100,15 @@ export async function fetchAlphaVantage(
   url.searchParams.set("apikey", deps.env.ALPHAVANTAGE_API_KEY ?? "");
 
   let response: Response;
+  let text: string;
   try {
     response = await deps.fetch(url, {
       cache: "no-store", // never let Next.js or the platform cache raw responses
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
+    // The body arrives after the headers and the 5-second timeout still applies while
+    // it does, so it is read inside this try: a body that stalls counts as unreachable.
+    text = await response.text();
   } catch (error) {
     // Timeout or network failure: AlphaVantage is unreachable. Pause so the page's other
     // requests (and other visitors') use stored data at once instead of each waiting
@@ -115,13 +120,17 @@ export async function fetchAlphaVantage(
     });
   }
   if (!response.ok) {
+    // A 5xx status means AlphaVantage itself is struggling, so pause as for a timeout.
+    // A 4xx status means something about this one request was wrong; others may work.
+    if (response.status >= 500) {
+      deps.limiter.pauseFor(PAUSE_AFTER_FAILURE_MS);
+    }
     throw new AlphaVantageError({
       kind: "error",
       message: `AlphaVantage responded with HTTP ${response.status}.`,
     });
   }
 
-  const text = await response.text();
   if (text.trimStart().startsWith("{")) {
     const problem = findProblem(JSON.parse(text));
     if (problem?.kind === "rate-limit") {

@@ -19,7 +19,9 @@ const now = () => NOW;
 
 describe("cached", () => {
   it("returns a fresh stored value without fetching", async () => {
-    const { store } = fakeStore({ k: { value: "old", fetchedAt: NOW - HOUR } });
+    const { store } = fakeStore({
+      "v1:k": { value: "old", fetchedAt: NOW - HOUR },
+    });
     const fetchFresh = vi.fn(async () => "new");
     const result = await cached("k", 24 * HOUR, fetchFresh, { store, now });
     expect(result).toEqual({ value: "old", fetchedAt: NOW - HOUR });
@@ -30,24 +32,24 @@ describe("cached", () => {
     const { store, data } = fakeStore();
     const result = await cached("k", HOUR, async () => "new", { store, now });
     expect(result).toEqual({ value: "new", fetchedAt: NOW });
-    expect(data.get("k")).toEqual({ value: "new", fetchedAt: NOW });
+    expect(data.get("v1:k")).toEqual({ value: "new", fetchedAt: NOW });
   });
 
   it("refreshes a value older than maxAge", async () => {
     const { store, data } = fakeStore({
-      k: { value: "old", fetchedAt: NOW - 25 * HOUR },
+      "v1:k": { value: "old", fetchedAt: NOW - 25 * HOUR },
     });
     const result = await cached("k", 24 * HOUR, async () => "new", {
       store,
       now,
     });
     expect(result.value).toBe("new");
-    expect(data.get("k")).toEqual({ value: "new", fetchedAt: NOW });
+    expect(data.get("v1:k")).toEqual({ value: "new", fetchedAt: NOW });
   });
 
   it("returns the old value when the refresh fails", async () => {
     const { store, data } = fakeStore({
-      k: { value: "old", fetchedAt: NOW - 25 * HOUR },
+      "v1:k": { value: "old", fetchedAt: NOW - 25 * HOUR },
     });
     const result = await cached(
       "k",
@@ -59,7 +61,10 @@ describe("cached", () => {
     );
     expect(result).toEqual({ value: "old", fetchedAt: NOW - 25 * HOUR });
     // The failure is not written; the old entry is untouched.
-    expect(data.get("k")).toEqual({ value: "old", fetchedAt: NOW - 25 * HOUR });
+    expect(data.get("v1:k")).toEqual({
+      value: "old",
+      fetchedAt: NOW - 25 * HOUR,
+    });
   });
 
   it("passes the error on when it fails and nothing is stored", async () => {
@@ -74,7 +79,7 @@ describe("cached", () => {
         { store, now },
       ),
     ).rejects.toThrow("rate limited");
-    expect(data.has("k")).toBe(false);
+    expect(data.has("v1:k")).toBe(false);
   });
 
   it("shares one fetch between simultaneous callers", async () => {
@@ -90,8 +95,21 @@ describe("cached", () => {
   });
 
   it("ignores stored data with an unexpected shape", async () => {
-    const { store } = fakeStore({ k: "garbage" });
+    const { store } = fakeStore({ "v1:k": "garbage" });
     const result = await cached("k", HOUR, async () => "new", { store, now });
+    expect(result.value).toBe("new");
+  });
+
+  it("ignores entries written under another key version", async () => {
+    // Fresh entries, but stored by code with a different (or no) version prefix.
+    const { store } = fakeStore({
+      k: { value: "unversioned", fetchedAt: NOW - HOUR },
+      "v0:k": { value: "older version", fetchedAt: NOW - HOUR },
+    });
+    const result = await cached("k", 24 * HOUR, async () => "new", {
+      store,
+      now,
+    });
     expect(result.value).toBe("new");
   });
 

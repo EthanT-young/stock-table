@@ -113,12 +113,44 @@ describe("fetchAlphaVantage", () => {
     expect(pause).toHaveBeenCalledWith(60_000);
   });
 
-  it("throws on a non-200 HTTP status", async () => {
-    const { deps: d } = deps("oops");
+  it("pauses all calls when reading the body times out", async () => {
+    const { deps: d, limiter } = deps("{}");
+    // The headers arrive, then the body stream fails the way it does when the
+    // 5-second timeout fires part-way through.
+    const stalledBody = new ReadableStream({
+      pull(controller) {
+        controller.error(
+          new DOMException("The operation timed out.", "TimeoutError"),
+        );
+      },
+    });
+    d.fetch = (async () => new Response(stalledBody)) as typeof fetch;
+    const pause = vi.spyOn(limiter, "pauseFor");
+    const request = fetchAlphaVantage({ function: "X" }, 0, d);
+    await expect(request).rejects.toThrow(AlphaVantageError);
+    await expect(request).rejects.toThrow(/could not be reached/);
+    expect(pause).toHaveBeenCalledWith(60_000);
+  });
+
+  it("throws and pauses all calls on an HTTP 5xx status", async () => {
+    const { deps: d, limiter } = deps("oops");
     d.fetch = (async () =>
       new Response("oops", { status: 503 })) as typeof fetch;
+    const pause = vi.spyOn(limiter, "pauseFor");
     await expect(fetchAlphaVantage({ function: "X" }, 0, d)).rejects.toThrow(
       /503/,
     );
+    expect(pause).toHaveBeenCalledWith(60_000);
+  });
+
+  it("throws without pausing on an HTTP 4xx status", async () => {
+    const { deps: d, limiter } = deps("oops");
+    d.fetch = (async () =>
+      new Response("oops", { status: 404 })) as typeof fetch;
+    const pause = vi.spyOn(limiter, "pauseFor");
+    await expect(fetchAlphaVantage({ function: "X" }, 0, d)).rejects.toThrow(
+      /404/,
+    );
+    expect(pause).not.toHaveBeenCalled();
   });
 });

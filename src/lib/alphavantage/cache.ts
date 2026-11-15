@@ -46,6 +46,14 @@ export interface CachedResult<T> {
  */
 const STORE_TTL_SECONDS = 90 * 24 * 60 * 60; // 90 days
 
+/**
+ * Put in front of every key ("daily:AAPL" is stored as "v1:daily:AAPL"). Entries outlive
+ * deploys and are read back without checking the value's shape, so bump this whenever
+ * the shape of a stored value changes: the new code then ignores the old entries instead
+ * of misreading them.
+ */
+const KEY_VERSION = "v1";
+
 let defaultStore: KeyValueStore | undefined;
 
 /** The real store, created on first use (it reads Vercel's environment variables). */
@@ -130,26 +138,27 @@ export async function cached<T>(
 ): Promise<CachedResult<T>> {
   const store = options.store ?? getDefaultStore();
   const now = options.now ?? Date.now;
+  const storeKey = `${KEY_VERSION}:${key}`;
 
-  const stored = await readEntry<T>(store, key);
+  const stored = await readEntry<T>(store, storeKey);
   if (stored && now() - stored.fetchedAt < maxAgeMs) {
     return { value: stored.value, fetchedAt: stored.fetchedAt };
   }
 
   const inFlight = inFlightRequests();
-  let refresh = inFlight.get(key) as Promise<StoredEntry<T>> | undefined;
+  let refresh = inFlight.get(storeKey) as Promise<StoredEntry<T>> | undefined;
   if (!refresh) {
     refresh = (async () => {
       const value = await fetchFresh();
       const entry: StoredEntry<T> = { value, fetchedAt: now() };
-      await writeEntry(store, key, entry);
+      await writeEntry(store, storeKey, entry);
       return entry;
     })();
-    inFlight.set(key, refresh);
+    inFlight.set(storeKey, refresh);
     // Forget the request once it has finished, whether it succeeded or failed.
     refresh.then(
-      () => inFlight.delete(key),
-      () => inFlight.delete(key),
+      () => inFlight.delete(storeKey),
+      () => inFlight.delete(storeKey),
     );
   }
 
