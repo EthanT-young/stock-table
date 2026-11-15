@@ -36,7 +36,7 @@ const SHARES_BODY = JSON.stringify({
   data: [
     {
       date: "2026-09-30",
-      shares_outstanding_diluted: "1000",
+      shares_outstanding_diluted: "1100",
       shares_outstanding_basic: "1000",
     },
   ],

@@ -8,7 +8,6 @@ import {
   AlphaVantageError,
   isRecord,
   throwIfProblem,
-  toNumber,
 } from "@/lib/alphavantage/parse";
 
 /**
@@ -143,39 +142,71 @@ export function parseListingStatus(
 export interface SharesOutstanding {
   /** End of the quarter the count belongs to, "YYYY-MM-DD". */
   date: string;
-  /** Diluted shares outstanding (a quarterly average, so market cap is an estimate). */
+  /**
+   * Basic shares outstanding, or diluted when basic is missing (a quarterly average, so
+   * market cap is an estimate).
+   */
   shares: number;
+}
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** A share count field as a number, or null if it is missing, not a number or not positive. */
+function countOrNull(value: unknown): number | null {
+  const count = numberOrNull(value);
+  return count !== null && count > 0 ? count : null;
+}
+
+/**
+ * The share count in one row, or null if the row has none. Market cap is conventionally
+ * basic shares x price, so basic is preferred; diluted (which also counts options and
+ * convertible securities) is the fallback.
+ */
+function shareCount(row: Record<string, unknown>): number | null {
+  return (
+    countOrNull(row["shares_outstanding_basic"]) ??
+    countOrNull(row["shares_outstanding_diluted"])
+  );
 }
 
 /**
  * Reads a SHARES_OUTSTANDING response:
  *
  *   { "symbol": "AAPL", "status": "success",
- *     "data": [ { "date": "2026-09-30", "shares_outstanding_diluted": "14630318000", ... }, ... ] }
+ *     "data": [ { "date": "2026-09-30", "shares_outstanding_basic": "14630318000",
+ *                 "shares_outstanding_diluted": "14630318000" }, ... ] }
  *
  * Returns only the most recent quarter. Older rows contain known quirks (duplicate
- * dates, counts from before stock splits), so they are never used.
+ * dates, counts from before stock splits), so they are never used. Rows without a
+ * "YYYY-MM-DD" date or a share count are skipped.
  */
 export function parseSharesOutstanding(body: unknown): SharesOutstanding {
   throwIfProblem(body);
   const data = isRecord(body) ? body["data"] : undefined;
-  if (!Array.isArray(data) || data.length === 0) {
-    throw new AlphaVantageError({
-      kind: "error",
-      message: "SHARES_OUTSTANDING returned no data.",
-    });
+  const rows = Array.isArray(data) ? data : [];
+
+  // Keep only usable rows, then find the newest ourselves instead of trusting the order.
+  let newest: SharesOutstanding | null = null;
+  for (const row of rows) {
+    if (!isRecord(row)) {
+      continue;
+    }
+    const date = row["date"];
+    const shares = shareCount(row);
+    if (typeof date !== "string" || !ISO_DATE.test(date) || shares === null) {
+      continue;
+    }
+    // "YYYY-MM-DD" strings compare in date order.
+    if (newest === null || date > newest.date) {
+      newest = { date, shares };
+    }
   }
 
-  // Find the newest row ourselves instead of trusting the order.
-  const rows = data.filter(isRecord);
-  const newest = rows.reduce((best, row) =>
-    String(row["date"]) > String(best["date"]) ? row : best,
-  );
-  return {
-    date: String(newest["date"]),
-    shares: toNumber(
-      newest["shares_outstanding_diluted"],
-      "shares outstanding",
-    ),
-  };
+  if (newest === null) {
+    throw new AlphaVantageError({
+      kind: "error",
+      message: "SHARES_OUTSTANDING returned no usable data.",
+    });
+  }
+  return newest;
 }
