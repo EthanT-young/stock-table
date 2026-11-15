@@ -111,4 +111,14 @@ describe("parseDailySeries", () => {
       }),
     ).toThrow(/close/);
   });
+
+  it("throws an error (never cached) when the series has no days", () => {
+    try {
+      parseDailySeries({ "Time Series (Daily)": {} });
+      expect.unreachable("should have thrown");
+    } catch (error) {
+      expect(error).toBeInstanceOf(AlphaVantageError);
+      expect((error as AlphaVantageError).kind).toBe("error");
+    }
+  });
 });

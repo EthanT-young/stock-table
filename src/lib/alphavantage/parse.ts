@@ -106,7 +106,7 @@ export function toNumber(value: unknown, field: string): number {
  *       "2026-11-13": { "1. open": "...", "4. close": "356.2700", "5. volume": "39029552" },
  *       ... } }
  *
- * Returns the days sorted newest first.
+ * Returns the days sorted newest first. Throws if there are none.
  */
 export function parseDailySeries(body: unknown): DailyPrice[] {
   throwIfProblem(body);
@@ -115,6 +115,15 @@ export function parseDailySeries(body: unknown): DailyPrice[] {
     throw new AlphaVantageError({
       kind: "error",
       message: 'Missing "Time Series (Daily)" in response.',
+    });
+  }
+
+  // An empty series is not a usable answer. Throwing keeps it out of the cache, so the
+  // page falls back to older data instead of showing no prices for a day.
+  if (Object.keys(series).length === 0) {
+    throw new AlphaVantageError({
+      kind: "error",
+      message: '"Time Series (Daily)" has no days.',
     });
   }
 
