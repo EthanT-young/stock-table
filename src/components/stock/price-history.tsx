@@ -3,6 +3,7 @@ import { FaceDownCard } from "@/components/card-back";
 import { FlipReveal } from "@/components/flip-reveal";
 import {
   NOT_AVAILABLE,
+  formatCompactVolume,
   formatDate,
   formatPercent,
   formatPrice,
@@ -20,8 +21,17 @@ function changeColor(changePercent: number | null): string {
   return "text-muted";
 }
 
-/** The panel frame and heading, turned over like a card when it appears. */
-function HistoryPanel({ children }: { children: React.ReactNode }) {
+/**
+ * The panel frame and heading, turned over like a card when it appears. The subtitle
+ * with the number of days only shows when there are rows to count.
+ */
+function HistoryPanel({
+  rowCount,
+  children,
+}: {
+  rowCount?: number; // the "?" makes it optional; it is undefined when there is no data
+  children: React.ReactNode;
+}) {
   return (
     <FlipReveal delayMs={240}>
       <section className="overflow-hidden rounded-md border border-border bg-surface">
@@ -30,9 +40,12 @@ function HistoryPanel({ children }: { children: React.ReactNode }) {
             <h2 className="font-display text-[24px] text-crimson md:text-h3">
               Daily history
             </h2>
-            <p className="mt-1 text-xs text-muted">
-              100 trading days · Newest first
-            </p>
+            {rowCount !== undefined && (
+              <p className="mt-1 text-xs text-muted">
+                {rowCount} trading {rowCount === 1 ? "day" : "days"} · Newest
+                first
+              </p>
+            )}
           </div>
         </div>
         {children}
@@ -44,14 +57,14 @@ function HistoryPanel({ children }: { children: React.ReactNode }) {
 /**
  * The list of historical prices: date, close, volume and % change from the previous
  * trading day, newest first. The rows scroll inside a fixed-height box while the column
- * headings stay in place. Phones hide the volume column to keep rows readable.
+ * headings stay in place. Phones show shorter dates and volumes so all four columns fit.
  */
 export async function PriceHistory({ symbol }: { symbol: string }) {
   const prices = await loadPrices(symbol);
-  if (!prices) {
+  if (!prices || prices.length === 0) {
     return (
       <HistoryPanel>
-        <p className="px-6 pb-6 text-body text-muted">
+        <p className="px-5 pb-5 text-body text-muted md:px-6 md:pb-6">
           Price history isn&rsquo;t available right now. Please try again later.
         </p>
       </HistoryPanel>
@@ -60,9 +73,11 @@ export async function PriceHistory({ symbol }: { symbol: string }) {
   const rows = withDailyChange(prices);
 
   return (
-    <HistoryPanel>
-      {/* tabIndex lets keyboard users focus the box and scroll it with the arrow keys. */}
+    <HistoryPanel rowCount={rows.length}>
+      {/* tabIndex lets keyboard users focus the box and scroll it with the arrow keys.
+          role="region" makes it a named area, so screen readers announce the label. */}
       <div
+        role="region"
         tabIndex={0}
         aria-label={`${symbol} daily price history, scrollable`}
         className="history-scroll h-[308px] overflow-y-auto md:h-[378px]"
@@ -76,17 +91,14 @@ export async function PriceHistory({ symbol }: { symbol: string }) {
             <tr className="h-[42px]">
               <th
                 scope="col"
-                className="w-[40%] pl-5 font-semibold md:w-[34%] md:pl-6"
+                className="w-[27%] pl-5 font-semibold md:w-[34%] md:pl-6"
               >
                 Date
               </th>
-              <th scope="col" className="w-[30%] font-semibold md:w-[22%]">
+              <th scope="col" className="w-[26%] font-semibold md:w-[22%]">
                 Close (USD)
               </th>
-              <th
-                scope="col"
-                className="hidden w-[26%] font-semibold md:table-cell"
-              >
+              <th scope="col" className="w-[23%] font-semibold md:w-[26%]">
                 Volume
               </th>
               <th scope="col" className="font-semibold">
@@ -108,8 +120,13 @@ export async function PriceHistory({ symbol }: { symbol: string }) {
                   </span>
                 </td>
                 <td>{formatPrice(row.close)}</td>
-                <td className="hidden md:table-cell">
-                  {formatVolume(row.volume)}
+                <td>
+                  <span className="md:hidden">
+                    {formatCompactVolume(row.volume)}
+                  </span>
+                  <span className="hidden md:inline">
+                    {formatVolume(row.volume)}
+                  </span>
                 </td>
                 <td className={`font-medium ${changeColor(row.changePercent)}`}>
                   {row.changePercent === null

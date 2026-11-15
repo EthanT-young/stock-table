@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   NOT_AVAILABLE,
+  formatCompactVolume,
   formatDate,
   formatMarketCap,
   formatPercent,
@@ -33,6 +34,13 @@ describe("prices and volume", () => {
 
   it("formats volume as a whole number with separators", () => {
     expect(formatVolume(42186500)).toBe("42,186,500");
+  });
+
+  it("shortens volume with K, M and B suffixes for phones", () => {
+    expect(formatCompactVolume(45234567)).toBe("45.2M");
+    expect(formatCompactVolume(1300000000)).toBe("1.3B");
+    expect(formatCompactVolume(980000)).toBe("980.0K");
+    expect(formatCompactVolume(12000000)).toBe("12.0M");
   });
 });
 

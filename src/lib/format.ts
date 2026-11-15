@@ -31,6 +31,13 @@ const twoDecimals = new Intl.NumberFormat("en-US", {
 const wholeNumber = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
+// "Compact" notation shortens large numbers with K, M and B suffixes. Always one decimal,
+// so the numbers line up in the column ("39.0M" above "31.9M").
+const compactNumber = new Intl.NumberFormat("en-US", {
+  notation: "compact",
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
 
 /** 237.49 -> "237.49", 1234.5 -> "1,234.50" (table cells; the column header says USD). */
 export function formatPrice(value: number): string {
@@ -45,6 +52,11 @@ export function formatUsd(value: number): string {
 /** 42186500 -> "42,186,500" */
 export function formatVolume(value: number): string {
   return wholeNumber.format(value);
+}
+
+/** 45234567 -> "45.2M", 1300000000 -> "1.3B", 980000 -> "980.0K" (phone table). */
+export function formatCompactVolume(value: number): string {
+  return compactNumber.format(value);
 }
 
 /**
