@@ -145,8 +145,8 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
           <DealButton />
         </div>
 
-        <p className="mt-5 text-micro font-semibold tracking-[0.8px] text-ivory">
-          BROWSE BY SECTOR
+        <p className="mt-5 text-micro font-semibold tracking-[0.8px] text-ivory uppercase">
+          Browse by sector
         </p>
         {/* On phones the chips scroll sideways; on wider screens they wrap. */}
         <div
