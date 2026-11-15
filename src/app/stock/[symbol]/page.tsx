@@ -75,22 +75,23 @@ export default async function StockPage({
           </Suspense>
         </div>
 
-        {/* Phones stack chart, history, overview; wide screens put the overview beside
-            the chart and the history below both. `order-*` sets the visual order. */}
+        {/* Phones stack chart, overview, history; wide screens put the overview beside
+            the chart and the history below both. The visual order matches the order in
+            the HTML at every width, so keyboard Tab order follows what's on screen. */}
         <div className="mt-6 grid gap-6 md:mt-9 lg:grid-cols-[1fr_422px]">
-          <div className="order-1">
+          <div>
             <Suspense fallback={<RouletteLoader symbol={ticker.symbol} />}>
               <PricePerformance symbol={ticker.symbol} />
             </Suspense>
           </div>
 
-          <div className="order-3 lg:order-2">
+          <div>
             <Suspense fallback={<CompanyOverviewPlaceholder />}>
               <CompanyOverview symbol={ticker.symbol} />
             </Suspense>
           </div>
 
-          <div className="order-2 lg:order-3 lg:col-span-2">
+          <div className="lg:col-span-2">
             <Suspense fallback={<PriceHistoryPlaceholder />}>
               <PriceHistory symbol={ticker.symbol} />
             </Suspense>

@@ -134,10 +134,13 @@ export function PriceChart({
 
       {/* The chart is drawn in the browser only; the table below carries the same data
           for screen readers and anyone without JavaScript, so the drawing is hidden from
-          assistive technology. A fixed height avoids the page jumping when it appears. */}
+          assistive technology. A fixed height avoids the page jumping when it appears.
+          accessibilityLayer={false} turns off Recharts' built-in keyboard support, which
+          would otherwise make the hidden drawing a Tab stop with nothing to announce. */}
       <div aria-hidden className="mt-6 w-full flex-1">
         <ComposedChart
           responsive
+          accessibilityLayer={false}
           data={chartData}
           style={{ width: "100%", height: 260 }}
           margin={{ top: 8, right: 0, bottom: 0, left: 0 }}

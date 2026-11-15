@@ -37,6 +37,13 @@ export default function HomePage() {
     <>
       <SiteHeader />
       <main className="mx-auto w-full max-w-[1440px] px-5 md:px-16">
+        {/* The hero below, and the h1 inside it, is hidden on desktops. This copy of the
+            heading takes over there: it exists only at desktop width (hidden lg:block) and
+            is invisible but still read by screen readers (sr-only), so every width has
+            exactly one h1. */}
+        <h1 className="sr-only hidden lg:block">
+          Big companies. A clearer view.
+        </h1>
         <DecoPanel
           tone="crimson"
           className="mt-4 p-6 md:mt-6 md:p-10 lg:hidden"
