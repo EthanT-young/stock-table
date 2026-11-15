@@ -17,10 +17,12 @@ export function SiteHeader() {
               height={20}
             />
           </span>
-          <span className="font-display text-h3 text-crimson">Stock Table</span>
+          <span className="font-display text-[22px] whitespace-nowrap text-crimson sm:text-h3">
+            Stock Table
+          </span>
         </Link>
         <nav className="ml-auto flex items-center">
-          <ExploreLink className="rounded-xl bg-crimson px-3 py-2 text-xs font-medium text-on-crimson" />
+          <ExploreLink className="rounded-xl bg-crimson px-3 py-2 text-xs font-medium whitespace-nowrap text-on-crimson" />
         </nav>
       </div>
       {/* Thin gold line along the bottom of the bar */}
