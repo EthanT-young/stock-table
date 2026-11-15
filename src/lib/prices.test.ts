@@ -72,6 +72,32 @@ describe("pricesInRange", () => {
     expect(pricesInRange(months, "3M")).toHaveLength(4);
   });
 
+  // Each case: latest day, range, expected cutoff. The data holds the latest day, the
+  // cutoff and the day before the cutoff, so only the first two should be kept.
+  it.each([
+    ["2026-03-31", "1M", "2026-02-28"], // February is shorter
+    ["2028-03-31", "1M", "2028-02-29"], // leap year
+    ["2026-05-31", "3M", "2026-02-28"],
+    ["2026-12-31", "1M", "2026-11-30"], // November has 30 days
+    ["2026-01-31", "1M", "2025-12-31"], // across the year boundary
+    ["2026-11-13", "1M", "2026-10-13"],
+  ] as const)(
+    "from %s, %s starts on %s at month ends",
+    (latest, range, cutoff) => {
+      const dayBefore = new Date(`${cutoff}T00:00:00Z`);
+      dayBefore.setUTCDate(dayBefore.getUTCDate() - 1);
+      const days: DailyPrice[] = [
+        latest,
+        cutoff,
+        dayBefore.toISOString().slice(0, 10),
+      ].map((date) => ({ date, close: 1, volume: 1 }));
+      expect(pricesInRange(days, range).map((d) => d.date)).toEqual([
+        latest,
+        cutoff,
+      ]);
+    },
+  );
+
   it("5D keeps the latest trading day and the 5 before it", () => {
     const week: DailyPrice[] = [
       "2026-11-13",

@@ -56,10 +56,33 @@ export type ChartRange = "5D" | "1M" | "3M";
 const FIVE_DAY_POINTS = 6;
 
 /**
+ * The same day of the month `months` calendar months before a "YYYY-MM-DD" date. When that
+ * month is shorter, the result is its last day: Mar 31 minus one month is Feb 28 (Feb 29
+ * in a leap year), not Mar 3 as plain month arithmetic on a Date would give.
+ */
+function sameDayMonthsEarlier(isoDate: string, months: number): string {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  // Months in Date.UTC count from 0, and an out-of-range month rolls into the
+  // neighboring year, so January minus one month is December of the year before.
+  const firstOfTarget = new Date(Date.UTC(year, month - 1 - months, 1));
+  const targetYear = firstOfTarget.getUTCFullYear();
+  const targetMonth = firstOfTarget.getUTCMonth();
+  // Day 0 of the following month is the last day of the target month.
+  const lastDay = new Date(
+    Date.UTC(targetYear, targetMonth + 1, 0),
+  ).getUTCDate();
+  const result = new Date(
+    Date.UTC(targetYear, targetMonth, Math.min(day, lastDay)),
+  );
+  return result.toISOString().slice(0, 10); // back to "YYYY-MM-DD"
+}
+
+/**
  * Returns the prices that fall inside a chart range, still newest first.
  * 5D is the latest trading day and the 5 before it (weekends and holidays aren't in the
- * data, so this is a trading week). 1M and 3M count calendar months back from the latest
- * trading day.
+ * data, so this is a trading week). 1M and 3M keep days on or after the same date 1 or 3
+ * calendar months before the latest trading day (or that month's last day, if it is
+ * shorter).
  */
 export function pricesInRange(
   newestFirst: readonly DailyPrice[],
@@ -72,11 +95,9 @@ export function pricesInRange(
     return [];
   }
   const monthsBack = range === "1M" ? 1 : 3;
-  const cutoff = new Date(newestFirst[0].date); // latest trading day, midnight UTC
-  cutoff.setUTCMonth(cutoff.getUTCMonth() - monthsBack);
-  const cutoffIso = cutoff.toISOString().slice(0, 10); // back to "YYYY-MM-DD"
+  const cutoff = sameDayMonthsEarlier(newestFirst[0].date, monthsBack);
   // "YYYY-MM-DD" strings sort the same way as the dates they represent.
-  return newestFirst.filter((day) => day.date >= cutoffIso);
+  return newestFirst.filter((day) => day.date >= cutoff);
 }
 
 /**
