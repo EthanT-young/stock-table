@@ -35,11 +35,35 @@ const SYMBOLS = TICKERS.map((ticker) => ticker.symbol);
 // 5 requests per minute means one every 12 seconds; a little extra for safety.
 const SECONDS_BETWEEN_REQUESTS = 12.5;
 
-/** Reads `--name=value` from the command line. */
-function option(name: string, fallback: number): number {
+/**
+ * Reads `--name=value` from the command line, or returns `fallback` when it is absent.
+ * Exits with an error for a value that isn't a positive number (or, with `integer`, a
+ * positive whole number). Without this check "--max-calls=abc" would become NaN, and since
+ * every comparison with NaN is false, the request limit would silently disappear.
+ */
+function option(
+  name: string,
+  fallback: number,
+  { integer = false }: { integer?: boolean } = {},
+): number {
   const prefix = `--${name}=`;
   const arg = process.argv.find((a) => a.startsWith(prefix));
-  return arg ? Number(arg.slice(prefix.length)) : fallback;
+  if (!arg) {
+    return fallback;
+  }
+  const text = arg.slice(prefix.length).trim();
+  const value = Number(text);
+  const valid =
+    text !== "" &&
+    Number.isFinite(value) &&
+    value > 0 &&
+    (!integer || Number.isInteger(value));
+  if (!valid) {
+    const expected = integer ? "a positive whole number" : "a positive number";
+    console.error(`--${name} must be ${expected}, got "${text}".`);
+    process.exit(1);
+  }
+  return value;
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -159,6 +183,10 @@ async function runTask(
 }
 
 async function main(): Promise<void> {
+  // Check the options first, so a typo stops the script before any request is made.
+  const maxCalls = option("max-calls", 25, { integer: true });
+  const maxAgeHours = option("max-age-hours", Infinity);
+
   if (existsSync(".env.local")) {
     process.loadEnvFile(".env.local"); // Node's built-in .env reader
   }
@@ -167,8 +195,6 @@ async function main(): Promise<void> {
     throw new Error("Set ALPHAVANTAGE_API_KEY (for example in .env.local).");
   }
 
-  const maxCalls = option("max-calls", 25);
-  const maxAgeHours = option("max-age-hours", Infinity);
   const snapshot: Snapshot = JSON.parse(await readFile(SNAPSHOT_PATH, "utf8"));
   const tasks = planSnapshotTasks(
     snapshot,
