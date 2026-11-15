@@ -43,7 +43,7 @@ export function MarketCapValue({
       <span
         id={popoverId}
         popover="auto"
-        className="m-auto max-w-sm rounded-xl border border-border bg-surface p-4 text-small text-ink shadow-xl backdrop:bg-black/40"
+        className="m-auto max-w-[min(24rem,calc(100vw-2rem))] rounded-xl border border-border bg-surface p-4 text-small text-ink shadow-xl backdrop:bg-black/40"
       >
         <strong className="block font-semibold">Estimated market cap</strong>
         <span className="mt-2 block text-muted">

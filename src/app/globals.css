@@ -227,9 +227,26 @@ body {
   scrollbar-color: var(--color-crimson) var(--color-line);
 }
 
+/*
+ * Keyboard focus ring for the price history box. A ring on the box itself would be partly
+ * hidden: the box sits flush against its panel's clipped edges, and its sticky header
+ * paints over the top. So the panel (the box's parent) gets the ring instead, just outside
+ * its border where nothing covers it. Browsers without :has() keep the ring on the box.
+ */
 .history-scroll:focus-visible {
   outline: 2px solid var(--color-crimson);
   outline-offset: -2px;
+}
+
+@supports selector(:has(*)) {
+  .history-scroll:focus-visible {
+    outline: none;
+  }
+
+  :has(> .history-scroll:focus-visible) {
+    outline: 2px solid var(--color-crimson);
+    outline-offset: 2px;
+  }
 }
 
 /*

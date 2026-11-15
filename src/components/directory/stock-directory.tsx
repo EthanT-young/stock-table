@@ -132,7 +132,7 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
               onKeyDown={(event) => event.key === "Escape" && setQuery("")}
               placeholder="Search by company or ticker"
               autoComplete="off"
-              className="h-11 w-full rounded-md border border-input-border bg-white pr-16 pl-11 text-small text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory"
+              className="h-11 w-full rounded-md border border-input-border bg-white pr-3 pl-11 text-small text-ink placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ivory sm:pr-16"
             />
             <kbd className="pointer-events-none absolute top-2.5 right-2.5 hidden rounded bg-kbd px-1.5 py-1 font-sans text-micro font-medium text-muted sm:block">
               {shortcut}

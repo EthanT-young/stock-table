@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
   Area,
   CartesianGrid,
@@ -26,19 +26,61 @@ import {
 
 const RANGES: ChartRange[] = ["5D", "1M", "3M"];
 
-/** True when the visitor's system asks for reduced motion (then the chart doesn't animate). */
-function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  // useEffect runs after the component appears in the browser; window only exists there.
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReduced(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-  return reduced;
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+
+// React calls this to listen for changes to the setting, and the returned function to stop.
+function subscribeToReducedMotion(onChange: () => void): () => void {
+  const query = window.matchMedia(REDUCED_MOTION);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
 }
+
+/**
+ * True when the visitor's system asks for reduced motion (then the chart doesn't animate).
+ * The server has no window, so it assumes motion is fine. When the page first loads, the
+ * browser renders once with that same value (so its HTML matches the server's), then
+ * React switches to the real setting before the chart draws its line, so the line never
+ * starts an animation it then has to cancel. After that (and when navigating within the
+ * site) the setting is read directly during rendering.
+ */
+function usePrefersReducedMotion(): boolean {
+  return useSyncExternalStore(
+    subscribeToReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION).matches,
+    () => false,
+  );
+}
+
+/**
+ * The colors and arrow for the range's change: up, down, or flat (exactly 0.00% once
+ * rounded). Class names are written out in full so Tailwind keeps every color token.
+ */
+const TREND_STYLES = {
+  up: {
+    badge: "bg-positive-bg text-positive",
+    arrow: "↗",
+    line: "var(--color-positive)",
+  },
+  down: {
+    badge: "bg-negative-bg text-negative",
+    arrow: "↘",
+    line: "var(--color-negative)",
+  },
+  flat: {
+    badge: "bg-raised text-muted",
+    arrow: "→",
+    line: "var(--color-muted)",
+  },
+};
+
+// Y-axis labels show each tick exactly, with no rounding: "70" for whole numbers, "70.25"
+// for a step of 0.25. Prices have at most four decimals, so even for a nearly flat stock
+// Recharts' smallest step needs six (0.000035); with up to six allowed, two different
+// ticks can never print the same label. Normal price moves still show 0 to 2 decimals.
+const axisPrice = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 6,
+  useGrouping: false,
+});
 
 /** The box that appears when hovering over (or tapping) the chart. */
 function ChartTooltip({ active, payload }: TooltipContentProps) {
@@ -73,11 +115,14 @@ export function PriceChart({
   const change = rangeChangePercent(inRange);
   const chartData = [...inRange].reverse(); // charts draw left to right, oldest first
   const latest = prices[0];
-  const rising = change !== null && change >= 0;
   // The chart takes the color of the selected range: green if the price went up over it,
-  // red if it went down, with a light tint of the same color under the line. (Written out
-  // in full so Tailwind keeps both color tokens.)
-  const lineColor = rising ? "var(--color-positive)" : "var(--color-negative)";
+  // red if it went down, grey if flat, with a light tint of the same color under the line.
+  // The change is rounded to two decimals first, like the percentage shown, so a -0.001%
+  // change reads "0.00%" in grey rather than in red (the history table does the same).
+  const rounded = change === null ? 0 : Math.round(change * 100) / 100;
+  const trend =
+    TREND_STYLES[rounded > 0 ? "up" : rounded < 0 ? "down" : "flat"];
+  const lineColor = trend.line;
 
   return (
     <section className="blur-fade-in flex min-h-[374px] flex-col rounded-md border border-border bg-surface p-5 md:p-6 lg:min-h-[408px]">
@@ -92,13 +137,9 @@ export function PriceChart({
             </p>
             {change !== null && (
               <p
-                className={`rounded-xl px-3 py-2 text-xs font-medium ${
-                  rising
-                    ? "bg-positive-bg text-positive"
-                    : "bg-negative-bg text-negative"
-                }`}
+                className={`rounded-xl px-3 py-2 text-xs font-medium ${trend.badge}`}
               >
-                <span aria-hidden>{rising ? "↗" : "↘"}&nbsp;&nbsp;</span>
+                <span aria-hidden>{trend.arrow}&nbsp;&nbsp;</span>
                 {formatPercent(change)} in {range}
               </p>
             )}
@@ -163,7 +204,7 @@ export function PriceChart({
             axisLine={false}
             tickLine={false}
             tick={{ fill: "var(--color-muted)", fontSize: 11 }}
-            tickFormatter={(value: number) => value.toFixed(0)}
+            tickFormatter={(value: number) => axisPrice.format(value)}
           />
           <Tooltip
             content={ChartTooltip}
