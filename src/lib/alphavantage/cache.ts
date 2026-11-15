@@ -5,8 +5,8 @@
  *
  *   1. A stored result younger than maxAgeMs is returned without calling the API.
  *   2. Otherwise fetchFresh() runs. If it succeeds, the result is stored and returned.
- *   3. If it fails, the last stored result is returned even though it is old
- *      (marked `stale: true`), so the page can say "cached data from <date>".
+ *   3. If it fails, the last stored result is returned even though it is old, so the
+ *      page still has data while AlphaVantage is unavailable.
  *   4. If it fails and nothing was ever stored, the error is passed on and the caller
  *      falls back to the snapshot committed in the repo.
  *
@@ -38,8 +38,6 @@ export interface CachedResult<T> {
   value: T;
   /** When the value was fetched from AlphaVantage (ms since epoch). */
   fetchedAt: number;
-  /** True when this is old data returned because a refresh just failed. */
-  stale: boolean;
 }
 
 /**
@@ -135,7 +133,7 @@ export async function cached<T>(
 
   const stored = await readEntry<T>(store, key);
   if (stored && now() - stored.fetchedAt < maxAgeMs) {
-    return { value: stored.value, fetchedAt: stored.fetchedAt, stale: false };
+    return { value: stored.value, fetchedAt: stored.fetchedAt };
   }
 
   const inFlight = inFlightRequests();
@@ -157,10 +155,10 @@ export async function cached<T>(
 
   try {
     const fresh = await refresh;
-    return { value: fresh.value, fetchedAt: fresh.fetchedAt, stale: false };
+    return { value: fresh.value, fetchedAt: fresh.fetchedAt };
   } catch (error) {
     if (stored) {
-      return { value: stored.value, fetchedAt: stored.fetchedAt, stale: true };
+      return { value: stored.value, fetchedAt: stored.fetchedAt }; // old, but better than nothing
     }
     throw error;
   }

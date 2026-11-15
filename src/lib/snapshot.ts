@@ -1,9 +1,9 @@
 /**
  * The snapshot: a copy of AlphaVantage data committed to the repo (src/data/snapshot.json).
  *
- * It is the last line of defence. When a live call fails and the cache has nothing
- * either, the page shows snapshot data with a "cached data from <date>" label. It also
- * lets the app run without an API key at all, e.g. for a reviewer who clones the repo.
+ * It is the last line of defense. When a live call fails and the cache has nothing
+ * either, the page shows snapshot data instead. It also lets the app run without an API
+ * key at all, e.g. for a reviewer who clones the repo.
  *
  * The data is already parsed (by the same parse functions the live path uses) and each
  * item records when it was fetched. `npm run snapshot` refreshes it.
@@ -58,7 +58,9 @@ export function createSnapshotReader(snapshot: Snapshot): SnapshotReader {
 }
 
 // TypeScript infers a type from the JSON file's contents; we state the intended shape
-// instead. The snapshot test checks that the committed file really matches it.
+// instead. The compiler only catches fields of the wrong type here, not missing fields
+// or bad values; the snapshot test checks the parts that matter most (known symbols
+// only, valid daily prices, a fetch time on every item).
 export const committedSnapshot = snapshotJson as Snapshot;
 
 /** The snapshot committed to the repo. */

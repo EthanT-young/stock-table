@@ -22,18 +22,14 @@ describe("cached", () => {
     const { store } = fakeStore({ k: { value: "old", fetchedAt: NOW - HOUR } });
     const fetchFresh = vi.fn(async () => "new");
     const result = await cached("k", 24 * HOUR, fetchFresh, { store, now });
-    expect(result).toEqual({
-      value: "old",
-      fetchedAt: NOW - HOUR,
-      stale: false,
-    });
+    expect(result).toEqual({ value: "old", fetchedAt: NOW - HOUR });
     expect(fetchFresh).not.toHaveBeenCalled();
   });
 
   it("fetches and stores when nothing is stored", async () => {
     const { store, data } = fakeStore();
     const result = await cached("k", HOUR, async () => "new", { store, now });
-    expect(result).toEqual({ value: "new", fetchedAt: NOW, stale: false });
+    expect(result).toEqual({ value: "new", fetchedAt: NOW });
     expect(data.get("k")).toEqual({ value: "new", fetchedAt: NOW });
   });
 
@@ -49,7 +45,7 @@ describe("cached", () => {
     expect(data.get("k")).toEqual({ value: "new", fetchedAt: NOW });
   });
 
-  it("returns the old value, marked stale, when the refresh fails", async () => {
+  it("returns the old value when the refresh fails", async () => {
     const { store, data } = fakeStore({
       k: { value: "old", fetchedAt: NOW - 25 * HOUR },
     });
@@ -61,11 +57,7 @@ describe("cached", () => {
       },
       { store, now },
     );
-    expect(result).toEqual({
-      value: "old",
-      fetchedAt: NOW - 25 * HOUR,
-      stale: true,
-    });
+    expect(result).toEqual({ value: "old", fetchedAt: NOW - 25 * HOUR });
     // The failure is not written; the old entry is untouched.
     expect(data.get("k")).toEqual({ value: "old", fetchedAt: NOW - 25 * HOUR });
   });
