@@ -1,8 +1,11 @@
 /**
- * The two functions the pages call to get data:
+ * The functions the pages call to get data:
  *
- *   getDailyPrices(symbol)     100 trading days, newest first
- *   getCompanyProfile(symbol)  everything for the "Behind the ticker" card
+ *   getDailyPrices(symbol)      100 trading days, newest first
+ *   getCompanyIdentity(symbol)  name, exchange, asset type, sector and country for the
+ *                               page header (never fetches prices or share counts, so the
+ *                               header can appear sooner)
+ *   getCompanyProfile(symbol)   everything for the "Behind the ticker" card
  *
  * Each piece of data is looked up in this order:
  *   1. our cache, if the stored copy is recent enough        (no API request)
@@ -38,7 +41,9 @@ const DAY_MS = 24 * HOUR_MS;
 /** How long each kind of data counts as current. */
 export const MAX_AGE_MS = {
   daily: DAY_MS, // closing prices change once per trading day
-  overviewCheck: DAY_MS, // whether OVERVIEW is premium-only for our key
+  // Whether OVERVIEW is premium-only for our key. The answer only changes if the key's
+  // plan changes, and each check uses 1 of the free key's 25 daily requests.
+  overviewCheck: 7 * DAY_MS,
   overview: DAY_MS,
   listing: 7 * DAY_MS, // names and exchanges almost never change
   shares: 30 * DAY_MS, // share counts change once a quarter
@@ -52,17 +57,31 @@ export interface MarketCap {
   sharesAsOf: string | null;
 }
 
-/** Everything the "Behind the ticker" card shows. null means "N/A". */
-export interface CompanyProfile {
+/** What the page header shows. null means "N/A". */
+export interface CompanyIdentity {
   symbol: string;
   name: string | null;
   assetType: string | null;
   exchange: string | null;
-  description: string | null;
   sector: string | null;
-  industry: string | null;
   country: string | null;
+}
+
+/**
+ * Everything the "Behind the ticker" card shows: the identity fields plus the rest.
+ * (`extends` works like inheritance for a Java interface: all CompanyIdentity fields are
+ * included.) null means "N/A".
+ */
+export interface CompanyProfile extends CompanyIdentity {
+  description: string | null;
+  industry: string | null;
   marketCap: MarketCap | null;
+}
+
+/** The identity, plus the OVERVIEW data it was built from (null without OVERVIEW). */
+interface IdentityResult {
+  identity: CompanyIdentity;
+  overview: Overview | null;
 }
 
 /** What the loaders depend on, replaceable in tests. */
@@ -129,8 +148,8 @@ export function createStockData(deps: StockDataDeps) {
    * OVERVIEW data, or null when it is premium-only or unavailable.
    *
    * Whether OVERVIEW is premium-only depends on the API key, not on the company, so one
-   * check (cached for a day) covers all 16 companies: with a free key that is a single
-   * request per day instead of one per company.
+   * check (cached for a week) covers all 16 companies: with a free key that is a single
+   * request per week instead of one per company.
    */
   async function loadOverview(symbol: string): Promise<Overview | null> {
     // If the check has to call OVERVIEW and the key has access, that call already
@@ -221,26 +240,78 @@ export function createStockData(deps: StockDataDeps) {
     return loadDaily(symbol);
   }
 
+  async function fetchIdentity(symbol: string): Promise<IdentityResult> {
+    const overview = await loadOverview(symbol);
+    if (overview) {
+      // Premium key: OVERVIEW has every field.
+      return {
+        overview,
+        identity: {
+          symbol,
+          name: overview.name,
+          assetType: overview.assetType,
+          exchange: overview.exchange,
+          sector: overview.sector,
+          country: overview.country,
+        },
+      };
+    }
+
+    // No OVERVIEW data. Usually because it is premium-only for our key (free key); with
+    // a premium key it can also mean OVERVIEW couldn't be fetched right now. Use the free
+    // LISTING_STATUS instead; country is OVERVIEW-only and shows N/A.
+    const listing = await loadListing(symbol);
+    return {
+      overview: null,
+      identity: {
+        symbol,
+        name: listing?.name ?? null,
+        assetType: listing?.assetType ?? null,
+        exchange: listing?.exchange ?? null,
+        sector: deps.snapshot.sector(symbol),
+        country: null,
+      },
+    };
+  }
+
+  // Identity loads in progress, by symbol. The header and the "Behind the ticker" card
+  // load at the same time and both need the identity; sharing one load means the OVERVIEW
+  // data that the premium check already fetched is never requested a second time.
+  const identitiesInFlight = new Map<string, Promise<IdentityResult>>();
+
+  function loadIdentity(symbol: string): Promise<IdentityResult> {
+    let pending = identitiesInFlight.get(symbol);
+    if (!pending) {
+      pending = fetchIdentity(symbol).finally(() =>
+        identitiesInFlight.delete(symbol),
+      );
+      identitiesInFlight.set(symbol, pending);
+    }
+    return pending;
+  }
+
+  /** The header's fields: OVERVIEW with a premium key, otherwise LISTING_STATUS. */
+  async function getCompanyIdentity(symbol: string): Promise<CompanyIdentity> {
+    return (await loadIdentity(symbol)).identity;
+  }
+
   /**
-   * The company profile. Requests are made one after another in order of importance
-   * (prices, OVERVIEW check, listing, share count), so if the per-minute quota runs out
-   * part-way, the most important data has already been fetched.
+   * The company profile. Its own requests are made one after another in order of
+   * importance (prices, OVERVIEW check, listing, share count), so if the per-minute quota
+   * runs out part-way, the most important data has already been fetched. (The page
+   * header loads the identity at the same time, so on a cold cache the OVERVIEW check
+   * and listing may go out alongside the prices; the requests are shared, not repeated.)
    */
   async function getCompanyProfile(symbol: string): Promise<CompanyProfile> {
     const daily = await loadDaily(symbol);
-    const overview = await loadOverview(symbol);
+    const { identity, overview } = await loadIdentity(symbol);
 
     if (overview) {
-      // Premium key: OVERVIEW has every field, including the real market cap.
+      // Premium key: OVERVIEW also has the real market cap.
       return {
-        symbol,
-        name: overview.name,
-        assetType: overview.assetType,
-        exchange: overview.exchange,
+        ...identity, // copy the identity fields into the new object
         description: overview.description,
-        sector: overview.sector,
         industry: overview.industry,
-        country: overview.country,
         marketCap:
           overview.marketCap === null
             ? null
@@ -248,10 +319,7 @@ export function createStockData(deps: StockDataDeps) {
       };
     }
 
-    // No OVERVIEW data. Usually because it is premium-only for our key (free key); with
-    // a premium key it can also mean OVERVIEW couldn't be fetched right now. Build what
-    // we can from free endpoints; the OVERVIEW-only fields show N/A.
-    const listing = await loadListing(symbol);
+    // Free endpoints only: estimate the market cap; the OVERVIEW-only fields show N/A.
     const shares = await loadShares(symbol);
     const latestClose = daily?.[0]?.close;
     const marketCap: MarketCap | null =
@@ -264,19 +332,14 @@ export function createStockData(deps: StockDataDeps) {
         : null;
 
     return {
-      symbol,
-      name: listing?.name ?? null,
-      assetType: listing?.assetType ?? null,
-      exchange: listing?.exchange ?? null,
+      ...identity,
       description: null,
-      sector: deps.snapshot.sector(symbol),
       industry: null,
-      country: null,
       marketCap,
     };
   }
 
-  return { getDailyPrices, getCompanyProfile };
+  return { getDailyPrices, getCompanyIdentity, getCompanyProfile };
 }
 
 // The real loaders used by the pages.
@@ -286,4 +349,5 @@ const stockData = createStockData({
 });
 
 export const getDailyPrices = stockData.getDailyPrices;
+export const getCompanyIdentity = stockData.getCompanyIdentity;
 export const getCompanyProfile = stockData.getCompanyProfile;

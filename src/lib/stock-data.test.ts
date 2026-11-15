@@ -106,12 +106,13 @@ const RATE_LIMITED = new AlphaVantageError({
 function setup(
   answers: Record<string, string | Error>,
   snap: Snapshot = sampleSnapshot,
+  store: KeyValueStore = memoryStore(),
 ) {
   const api = fakeApi(answers);
   const data = createStockData({
     fetchText: api.fetchText,
     snapshot: createSnapshotReader(snap),
-    cacheOptions: { store: memoryStore(), now: () => NOW },
+    cacheOptions: { store, now: () => NOW },
   });
   return { ...data, calls: api.calls };
 }
@@ -244,6 +245,89 @@ describe("getCompanyProfile with a premium key", () => {
       country: "USA",
       marketCap: { value: 3352782701000, estimated: false, sharesAsOf: null },
     });
+  });
+});
+
+describe("getCompanyIdentity", () => {
+  const PREMIUM_OVERVIEW = JSON.stringify({
+    Symbol: "AAPL",
+    AssetType: "Common Stock",
+    Name: "Apple Inc",
+    Exchange: "NASDAQ",
+    Sector: "TECHNOLOGY",
+    Country: "USA",
+  });
+
+  it("uses OVERVIEW fields with a premium key", async () => {
+    const { getCompanyIdentity, calls } = setup({
+      OVERVIEW: PREMIUM_OVERVIEW,
+    });
+    expect(await getCompanyIdentity("AAPL")).toEqual({
+      symbol: "AAPL",
+      name: "Apple Inc",
+      assetType: "Common Stock",
+      exchange: "NASDAQ",
+      sector: "TECHNOLOGY",
+      country: "USA",
+    });
+    expect(calls).toEqual(["OVERVIEW AAPL"]);
+  });
+
+  it("uses LISTING_STATUS with a free key, without prices or share counts", async () => {
+    const { getCompanyIdentity, calls } = setup({
+      TIME_SERIES_DAILY: dailyBody("110.00"),
+      OVERVIEW: PREMIUM_BODY,
+      LISTING_STATUS: LISTING_CSV,
+      SHARES_OUTSTANDING: SHARES_BODY,
+    });
+    expect(await getCompanyIdentity("AAPL")).toEqual({
+      symbol: "AAPL",
+      name: "Apple Inc",
+      assetType: "Stock",
+      exchange: "NASDAQ",
+      sector: "INFORMATION TECHNOLOGY",
+      country: null,
+    });
+    expect(calls).toEqual(["OVERVIEW AAPL", "LISTING_STATUS"]);
+  });
+
+  it("returns null (N/A) for anything that isn't available", async () => {
+    const { getCompanyIdentity } = setup({
+      OVERVIEW: RATE_LIMITED,
+      LISTING_STATUS: RATE_LIMITED,
+    });
+    expect(await getCompanyIdentity("TSLA")).toEqual({
+      symbol: "TSLA",
+      name: null,
+      assetType: null,
+      exchange: null,
+      sector: null,
+      country: null,
+    });
+  });
+
+  it("shares requests with a profile loading at the same time", async () => {
+    // A real store answers over the network, so a later read can come back first. This
+    // one answers the first read of each key slowly and later reads quickly.
+    const inner = memoryStore();
+    const reads = new Map<string, number>();
+    const slowStore: KeyValueStore = {
+      get: async (key) => {
+        const count = (reads.get(key) ?? 0) + 1;
+        reads.set(key, count);
+        const delayMs = count === 1 ? 50 : 1;
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        return inner.get(key);
+      },
+      set: inner.set,
+    };
+    const { getCompanyIdentity, getCompanyProfile, calls } = setup(
+      { TIME_SERIES_DAILY: dailyBody("110.00"), OVERVIEW: PREMIUM_OVERVIEW },
+      sampleSnapshot,
+      slowStore,
+    );
+    await Promise.all([getCompanyIdentity("AAPL"), getCompanyProfile("AAPL")]);
+    expect(calls.sort()).toEqual(["OVERVIEW AAPL", "TIME_SERIES_DAILY AAPL"]);
   });
 });
 

@@ -1,4 +1,4 @@
-import { loadProfile } from "@/app/stock/[symbol]/data";
+import { loadIdentity } from "@/app/stock/[symbol]/data";
 import { LogoTile } from "@/components/logo-tile";
 import { FaceDownCard } from "@/components/card-back";
 import { FlipReveal } from "@/components/flip-reveal";
@@ -12,8 +12,9 @@ import { NOT_AVAILABLE, toSentenceCase } from "@/lib/format";
  * finished HTML. While it waits, the page shows <CompanyIdentityPlaceholder /> instead.
  */
 export async function CompanyIdentity({ symbol }: { symbol: string }) {
-  const profile = await loadProfile(symbol);
-  const name = profile.name ?? NOT_AVAILABLE;
+  // Only the identity fields, so the header doesn't wait for prices or share counts.
+  const identity = await loadIdentity(symbol);
+  const name = identity.name ?? NOT_AVAILABLE;
 
   return (
     <FlipReveal>
@@ -26,20 +27,20 @@ export async function CompanyIdentity({ symbol }: { symbol: string }) {
             </h1>
             <p className="mt-1 text-xs font-medium text-muted md:text-small">
               {symbol}&nbsp;&nbsp;·&nbsp;&nbsp;
-              {profile.exchange ?? NOT_AVAILABLE}
-              &nbsp;&nbsp;·&nbsp;&nbsp;{profile.assetType ?? NOT_AVAILABLE}
+              {identity.exchange ?? NOT_AVAILABLE}
+              &nbsp;&nbsp;·&nbsp;&nbsp;{identity.assetType ?? NOT_AVAILABLE}
             </p>
           </div>
         </div>
         <div className="mt-4 flex flex-wrap gap-2.5">
           <p className="rounded-xl bg-raised px-3 py-2 text-xs font-medium text-gold-ink">
-            {profile.sector
-              ? toSentenceCase(profile.sector)
+            {identity.sector
+              ? toSentenceCase(identity.sector)
               : `Sector ${NOT_AVAILABLE}`}
           </p>
-          {profile.country && (
+          {identity.country && (
             <p className="rounded-xl bg-positive-bg px-3 py-2 text-xs font-medium text-positive">
-              {profile.country}
+              {identity.country}
             </p>
           )}
         </div>
