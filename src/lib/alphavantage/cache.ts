@@ -14,8 +14,9 @@
  * end up in the cache.
  *
  * Storage is Vercel's Runtime Cache (getCache from @vercel/functions). On Vercel it is
- * shared by all server instances and survives deploys; when running locally the same call
- * automatically uses an in-memory cache, so there is no separate code path.
+ * shared by the server instances in each region and survives deploys; when running
+ * locally the same call automatically uses an in-memory cache, so there is no separate
+ * code path.
  */
 
 import { getCache } from "@vercel/functions";
