@@ -192,7 +192,7 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
         </div>
 
         {shown.length > 0 ? (
-          <ul className="mt-6 grid gap-2.5 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
+          <ul className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
             {shown.map((item) => (
               <li key={item.symbol}>
                 <StockCard
