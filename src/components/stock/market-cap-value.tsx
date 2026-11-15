@@ -32,11 +32,13 @@ export function MarketCapValue({
   return (
     <>
       ≈ {formatMarketCap(marketCap.value)}{" "}
+      {/* The screen-reader name starts with the visible "est." so voice-control users can
+          say "click est" (WCAG 2.5.3). */}
       <button
         type="button"
         popoverTarget={popoverId}
         className="ml-1 rounded-md bg-track px-1.5 py-0.5 text-label font-semibold text-gold-ink underline decoration-dotted underline-offset-2"
-        aria-label="Estimated market cap: how it is calculated"
+        aria-label="est. (estimated market cap): how it is calculated"
       >
         est.
       </button>
