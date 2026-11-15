@@ -92,6 +92,9 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
   function clearFilters() {
     setQuery("");
     setSector(ALL_SECTORS);
+    // The button disappears once the cards are back, which would drop keyboard focus to
+    // the top of the page; put it in the search box the user was just using instead.
+    searchRef.current?.focus();
   }
 
   return (
@@ -172,7 +175,12 @@ export function StockDirectory({ items }: { items: DirectoryItem[] }) {
       {/* scroll-mt keeps the heading visible when "Explore stocks" jumps here */}
       <section id="collection" className="mt-7 scroll-mt-6 pb-12 md:mt-10">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-display text-[24px] text-crimson md:text-h2">
+          {/* tabIndex={-1}: not a Tab stop, but the "Explore stocks" link can move focus here. */}
+          <h2
+            id="collection-heading"
+            tabIndex={-1}
+            className="font-display text-[24px] text-crimson md:text-h2"
+          >
             The company collection
           </h2>
           {/* aria-live: screen readers announce the new count after each search or filter */}

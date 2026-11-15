@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ExploreLink } from "@/components/explore-link";
 
 /** The bar at the top of every page: brand on the left, "Explore stocks" on the right. */
 export function SiteHeader() {
@@ -19,13 +20,7 @@ export function SiteHeader() {
           <span className="font-display text-h3 text-crimson">Stock Table</span>
         </Link>
         <nav className="ml-auto flex items-center">
-          {/* <Link> navigates inside the app without a full page reload. */}
-          <Link
-            href="/#collection"
-            className="rounded-xl bg-crimson px-3 py-2 text-xs font-medium text-on-crimson"
-          >
-            Explore stocks
-          </Link>
+          <ExploreLink className="rounded-xl bg-crimson px-3 py-2 text-xs font-medium text-on-crimson" />
         </nav>
       </div>
       {/* Thin gold line along the bottom of the bar */}
