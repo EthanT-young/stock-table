@@ -120,8 +120,9 @@ body {
 
 /*
  * Card flip: while a section loads, it shows a face-down card (see card-back.tsx) that
- * gently "breathes". When the data arrives, the section mounts inside a two-sided card
- * that starts showing its back and turns over to reveal the section (see flip-reveal.tsx).
+ * gently "breathes" twice, then rests. When the data arrives, the section mounts inside a
+ * two-sided card that starts showing its back and turns over to reveal the section (see
+ * flip-reveal.tsx).
  * CSS only, so it plays as soon as the section arrives.
  */
 @keyframes card-breathe {
@@ -134,8 +135,10 @@ body {
   }
 }
 
+/* Two breaths (3.6 s), ending at normal size. Moving content must stop within 5 seconds
+   unless the page offers a way to pause it (WCAG 2.2.2), and a load can take longer. */
 .card-breathe {
-  animation: card-breathe 1.8s ease-in-out infinite;
+  animation: card-breathe 1.8s ease-in-out 2;
 }
 
 @keyframes card-flip-in {
@@ -255,8 +258,10 @@ body {
  * Landing (the "Spin for a company" overlay): the wheel spins and slows to a stop with the
  * company's pocket under the pointer (--land, set per company), the ball settles above
  * it, then the pocket turns gold and the caption changes.
- * Looping (the chart's loading state, inside .roulette-looping): wheel and ball keep
- * turning at a steady speed until React replaces the loader with the chart.
+ * Looping (the chart's loading state, inside .roulette-looping): wheel and ball turn at a
+ * steady speed for 4.8 s, then stop where they started and the caption changes to
+ * "Still loading…". Moving content must stop within 5 seconds unless the page offers a
+ * way to pause it (WCAG 2.2.2), and a load can take longer than that.
  */
 @keyframes roulette-wheel {
   from {
@@ -331,18 +336,23 @@ body {
   animation: roulette-disappear 0.2s ease-out 2.6s both;
 }
 
+/* 2 turns of 2.4 s and 3 turns of 1.6 s: both stop at 4.8 s, back at the top. */
 .roulette-looping .roulette-wheel {
   transform: none;
-  animation: roulette-turn 3s linear infinite;
+  animation: roulette-turn 2.4s linear 2;
 }
 
 .roulette-looping .roulette-ball {
-  animation: roulette-turn-back 2s linear infinite;
+  animation: roulette-turn-back 1.6s linear 3;
 }
 
-/* No landing, so the "Place your bets…" caption stays. */
+/* When the wheel stops, "Place your bets…" gives way to "Still loading…". */
 .roulette-looping .roulette-before-landing {
-  animation: none;
+  animation: roulette-disappear 0.2s ease-out 4.8s both;
+}
+
+.roulette-still-loading {
+  animation: roulette-appear 0.3s ease-out 4.8s both;
 }
 
 .roulette-reduced-motion {
@@ -358,7 +368,8 @@ body {
     animation: none;
   }
   .roulette-before-landing,
-  .roulette-after-landing.roulette-caption {
+  .roulette-after-landing.roulette-caption,
+  .roulette-still-loading {
     display: none;
   }
   .roulette-reduced-motion {
