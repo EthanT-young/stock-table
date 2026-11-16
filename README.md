@@ -36,22 +36,20 @@ weekends and market holidays the newest row is the last trading day. The app als
 prices for up to a day before asking again, which means a new close can take up to a
 day to appear.
 
-## Where each requirement lives
+## What's where
 
-| Requirement                                                                                                          | Where                                                                                                                       |
-| -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Homepage with 15+ stocks                                                                                             | `src/app/page.tsx`, list in `src/lib/tickers.ts`                                                                            |
-| Details page per stock                                                                                               | `src/app/stock/[symbol]/page.tsx` (`/stock/AAPL`, etc.)                                                                     |
-| Company overview (symbol, asset type, name, description, exchange, sector, industry, market cap, "N/A" when missing) | `src/components/stock/company-identity.tsx`, `company-overview.tsx`                                                         |
-| Daily prices: date, close, volume, % change vs the previous day                                                      | `src/components/stock/price-history.tsx`, math in `src/lib/prices.ts`                                                       |
-| Responsive design                                                                                                    | Tailwind breakpoints throughout; on phones the price table uses short dates and hides the volume column                     |
-| Logos                                                                                                                | `public/logos/`, downloaded once from AlphaVantage's logo server (`npm run logos`)                                          |
-| Loading animation                                                                                                    | Roulette wheel for the chart (`roulette-loader.tsx`), card flip for the other sections (`card-back.tsx`, `flip-reveal.tsx`) |
-| Line chart                                                                                                           | `src/components/stock/price-chart.tsx` (Recharts), 5D / 1M / 3M ranges, green or red by the range's change                  |
-
-Extras: search and sector filters on the homepage, a button that picks
-a random company with the roulette wheel, a 404 page for unknown symbols,
-and lowercase URLs redirecting to uppercase (`/stock/aapl` → `/stock/AAPL`).
+| Feature                                                                                                | Code                                                                               |
+| ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| 16 companies on the homepage, with search and sector filters                                           | `src/app/page.tsx`, `src/components/directory/`, the list in `src/lib/tickers.ts`  |
+| A details page for each company (`/stock/AAPL`, etc.)                                                  | `src/app/stock/[symbol]/page.tsx`                                                  |
+| Company profile, with "N/A" for anything missing                                                       | `src/components/stock/company-identity.tsx`, `company-overview.tsx`                |
+| 100 days of closing prices and volume, with the daily % change                                         | `src/components/stock/price-history.tsx`, math in `src/lib/prices.ts`              |
+| Price chart with 5D / 1M / 3M ranges, green or red by the range's change                               | `src/components/stock/price-chart.tsx` (Recharts)                                  |
+| Company logos                                                                                          | `public/logos/`, downloaded once from AlphaVantage's logo server (`npm run logos`) |
+| Loading animations: a roulette wheel for the chart, a card flip for the other sections                 | `roulette-loader.tsx`, `card-back.tsx`, `flip-reveal.tsx`                          |
+| Phone layout: the price table uses short dates and hides the volume column                             | Tailwind breakpoints throughout                                                    |
+| "Spin for a company", which picks a random company with the roulette wheel                             | `src/components/directory/deal-button.tsx`                                         |
+| 404 page for unknown symbols, and lowercase URLs redirect to uppercase (`/stock/aapl` → `/stock/AAPL`) | `src/app/stock/[symbol]/page.tsx`, `not-found.tsx`                                 |
 
 ## Free API key constraints
 
