@@ -18,7 +18,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: "Stock Table",
-  description: "16 familiar companies, their story and 100 days of prices.",
+  description: "16 familiar companies and 100 days of prices.",
 };
 
 /**

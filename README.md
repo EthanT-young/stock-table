@@ -33,8 +33,8 @@ free key's 25 requests per day. They are always on in a production deploy on Ver
 
 AlphaVantage adds each day's prices after the market closes (4 PM Eastern), so on
 weekends and market holidays the newest row is the last trading day. The app also keeps
-prices for up to a day before asking again, so a new close can take up to a day to
-appear.
+prices for up to a day before asking again, which means a new close can take up to a
+day to appear.
 
 ## Where each requirement lives
 
@@ -50,7 +50,7 @@ appear.
 | Line chart                                                                                                           | `src/components/stock/price-chart.tsx` (Recharts), 5D / 1M / 3M ranges, green or red by the range's change                  |
 
 Extras: search and sector filters on the homepage, a button that picks
-a random company with the roulette wheel, a real 404 page for unknown symbols,
+a random company with the roulette wheel, a 404 page for unknown symbols,
 and lowercase URLs redirecting to uppercase (`/stock/aapl` → `/stock/AAPL`).
 
 ## Free API key constraints
@@ -78,12 +78,10 @@ premium-only messages and other errors.
 Three parts of `src/lib/alphavantage/` keep the app inside the limits:
 
 - `cache.ts` keeps each result while it is current: prices for a day, listings for 7
-  days, share counts for 30 days. It stores only successful responses, so an error
-  message never ends up in the cache.
+  days, share counts for 30 days. It never stores an error response.
 - `rate-limiter.ts` hands out request slots. A page waits at most 3 seconds for one,
   then uses stored data.
-- `client.ts` pauses all calls for a minute after a rate-limit response or a timeout,
-  so the app stops sending requests that would fail.
+- `client.ts` pauses all calls for a minute after a rate-limit response or a timeout.
 
 The app looks up each piece of data in this order (`src/lib/stock-data.ts`):
 
@@ -108,14 +106,14 @@ The details page renders on the server. Each section (header, overview, chart, t
 is wrapped in React `<Suspense>`, so the page arrives immediately with placeholders, and
 each section streams in as soon as its own data is ready. While waiting, the chart shows
 a spinning roulette wheel and the other sections show a face-down playing card, which
-flips over when the data arrives. With "reduce motion" turned on in the operating
-system, all animations are replaced by static versions.
+flips over when the data arrives.
 
 ## Accessibility
 
 I checked the app against WCAG 2.2 level AA and fixed the issues I found. Every page
-works with only a keyboard, axe (an automated checker) reports no violations, and with
-"reduce motion" on, the loading animations are replaced with static versions.
+works with only a keyboard, and axe (an automated checker) reports no violations. With
+"reduce motion" turned on in the operating system, every animation is replaced by a
+static version.
 
 ## Project layout
 
@@ -154,9 +152,8 @@ scripts/               snapshot and logo download scripts
   never reaches the browser and every visitor is served from the same cache.
 - TypeScript runs in strict mode. Each API response is parsed into typed objects as
   soon as it arrives, and the rest of the code only sees those types.
-- Tailwind CSS keeps the color, type and spacing tokens in one file
-  (`src/app/globals.css`).
-- Recharts draws the line chart. Vitest runs the unit tests for the data logic:
+- Styling is Tailwind CSS with its color, type and spacing tokens in
+  `src/app/globals.css`. The chart uses Recharts, and Vitest covers the data logic:
   parsing, caching, rate limiting, price math and filtering.
 - If the app grew, I'd store prices in a database filled by a scheduled job, so visitor
   traffic would never trigger API calls and the history wouldn't depend on a cache that

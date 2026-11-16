@@ -5,13 +5,7 @@ export default function UnknownTicker() {
   return (
     <NotFoundPanel
       heading="This ticker isn’t in our collection."
-      message={
-        <>
-          We keep things focused: just 16 companies.
-          <br />
-          Find a familiar name back in the collection.
-        </>
-      }
+      message="Stock Table covers 16 companies. You can browse them all from the homepage."
     />
   );
 }
